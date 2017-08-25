@@ -3,19 +3,12 @@ import Foundation
 public struct Webhook {
     let id: String
     let url: URL
-    let account: Account
+    internal let account: Account
     
+    /// Deletes the given webhook from the account
+    ///
+    /// The URL will no longer receive updates
     func remove() {
-        
-    }
-}
-
-public extension Account {
-    func webhooks() -> [Webhook] {
-        return []
-    }
-    
-    func addWebhook() {
-        
+        account.removeWebhook(self)
     }
 }

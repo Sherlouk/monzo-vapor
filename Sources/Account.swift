@@ -10,6 +10,14 @@ public final class Account {
         
         /// Unknown Account
         case unknown
+        
+        init(rawValue: String) {
+            switch rawValue {
+            case "uk_prepaid": self = .prepaid
+            case "uk_retail": self = .current
+            default: self = .unknown
+            }
+        }
     }
     
     // MARK: Variables
@@ -29,14 +37,37 @@ public final class Account {
     /// The date in which the account was created
     let created: Date
     
+    /// Private storage of webhooks
+    private var _webhooks = [Webhook]()
+    
+    /// Whether or not webhooks been loaded from the API
+    private var webhooksLoaded = false
+    
+    /// List of current webhooks on the account
+    var webhooks: [Webhook] {
+        if !webhooksLoaded {
+            loadWebhooks()
+        }
+        
+        return _webhooks
+    }
+    
     // MARK: Initialiser
     
-    internal init(user: User, type: Type, id: String, description: String, created: Date) {
+    init(user: User, type: Type, id: String, description: String, created: Date) {
         self.user = user
         self.type = type
         self.id = id
         self.description = description
         self.created = created
+    }
+    
+    init(user: User, json: Client.JSONObject) throws {
+        self.user = user
+        self.type = try Type(rawValue: json.value(forKey: "type"))
+        self.id = try json.value(forKey: "id")
+        self.description = try json.value(forKey: "description")
+        self.created = try json.dateValue(forKey: "created")
     }
     
     // MARK: Transactions
@@ -61,5 +92,23 @@ public final class Account {
     
     func refresh() {
         // Reload cached values from Monzo API
+        // TBD?
+    }
+    
+    // MARK: Webhook
+    
+    func loadWebhooks() {
+        // Fetch from Monzo
+        // Update webhooks array
+    }
+    
+    func addWebhook(url: URL) {
+        // Update with Monzo
+        // Update webhook array
+    }
+    
+    func removeWebhook(_ webhook: Webhook) {
+        // Remove with Monzo
+        // Update webhook array
     }
 }

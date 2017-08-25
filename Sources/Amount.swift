@@ -1,20 +1,20 @@
 
-/// Represents a given amount of monies in a specific currency
+/// Represents a specific amount of monies in a given currency
 public struct Amount {
-    // MARK: Variables
+    // MARK: - Variables
     
     /// The amount in "minor units"
     ///
     /// Example: GBP has pence, USD/EUR has cents.
-    /// *100* would be *1 pound* (GBP)
-    let amount: Int64
+    /// *100* would be *100 pence / 1 pound* (GBP)
+    public let amount: Int64
 
     /// The ISO 4217 currency code
-    let currency: String
+    public let currency: String
 
-    // MARK: Initialiser
+    // MARK: - Initialiser
     
-    init(_ amount: Int64, currency: String) {
+    public init(_ amount: Int64, currency: String) {
         self.amount = amount
         self.currency = currency
     }

@@ -34,7 +34,7 @@ public struct Transaction {
     private(set) var metadata: [String: String]
     
     let category: String // Consider Enum?
-    let merchant: String // TBD
+    let merchant: Merchant
     
     // MARK: Metadata
     

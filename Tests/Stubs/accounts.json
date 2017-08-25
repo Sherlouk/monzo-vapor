@@ -1,0 +1,16 @@
+{
+    "accounts": [
+        {
+            "id": "acc_00009237aqC8c5umZmrRdh",
+            "description": "Peter Pan's Account",
+            "created": "2015-11-13T12:17:42Z",
+            "type": "uk_prepaid"
+        },
+        {
+            "id": "acc_00009237aqC8c5umZmrRdi",
+            "description": "Peter Pan's Current Account",
+            "created": "2015-11-13T12:17:43Z",
+            "type": "uk_retail"
+        }
+    ]
+}

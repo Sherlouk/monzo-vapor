@@ -13,8 +13,9 @@ public final class User {
         self.refreshToken = refreshToken
     }
     
-    func accounts() -> [Account] {
+    func accounts() throws -> [Account] {
         // Current API (by default) returns prepaid accounts, should also add a way to find current accounts
-        return []
+        let rawAccounts: [Client.JSONObject] = try client.makeRequest(path: "accounts").value(forKey: "accounts")
+        return try rawAccounts.map({ try Account.init(user: self, json: $0) })
     }
 }
