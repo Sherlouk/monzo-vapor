@@ -16,7 +16,7 @@ final class Provider {
         case createFeedItem(Account, String) // WIP
     }
     
-    let client: Client
+    private let client: Client
     
     init(client: Client) {
         self.client = client
@@ -29,6 +29,13 @@ final class Provider {
         return Request(method: req.method, uri: uri, version: version, headers: req.headers, body: req.body)
     }
     
+    func deliver(_ req: Requests) throws {
+        let request = try createRequest(req)
+        let response = try client.httpClient.respond(to: request)
+        
+        try validateResponseStatus(response.status)
+    }
+    
     func request(_ req: Requests) throws -> JSONObject {
         let request = try createRequest(req)
         let response = try client.httpClient.respond(to: request)
@@ -37,12 +44,18 @@ final class Provider {
         
         guard case .buffer(let data) = response.body else { throw ClientError.parsingError }
         let foundationData = Foundation.Data(bytes: data.bytes)
-        return try JSONObject(data: foundationData)
+        let json = try JSONObject(data: foundationData)
+        
+        if let nestedKey = req.nestedKey {
+            return json[nestedKey]
+        }
+        
+        return json
     }
     
     func requestArray(_ req: Requests) throws -> [JSONObject] {
-        guard let nestedArrayKey = req.nestedArrayKey else { throw ClientError.other(0, "Oops") }
-        return try request(req)[nestedArrayKey].arrayValue
+        guard let nestedKey = req.nestedKey else { throw ClientError.other(0, "Oops") }
+        return try request(req)[nestedKey].arrayValue
     }
     
     private func validateResponseStatus(_ status: Status) throws {
@@ -93,7 +106,7 @@ extension Provider.Requests {
         }
     }
     
-    var nestedArrayKey: String? {
+    var nestedKey: String? {
         switch self {
         case .listAccounts: return "accounts"
         case .transactions: return "transactions"

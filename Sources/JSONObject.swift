@@ -9,11 +9,13 @@ final class JSONObject {
         case string
         case array
         case null
+        case int64
     }
     
     var rawDictionary: JSONDictionary = [:]
     var rawString: String = ""
     var rawArray: [Any] = []
+    var rawInt64: Int64 = 0
     
     var error: JSONError?
     var type: Type = .null
@@ -33,6 +35,9 @@ final class JSONObject {
         } else if let jsonArray = jsonObject as? [Any] {
             self.rawArray = jsonArray
             self.type = .array
+        } else if let jsonInt64 = jsonObject as? Int64 {
+            self.rawInt64 = jsonInt64
+            self.type = .int64
         } else {
             print("Unknown Type")
             print(jsonObject)
@@ -78,6 +83,21 @@ final class JSONObject {
         switch self.type {
         case .array: return (try? rawArray.map { try JSONObject($0) }) ?? []
         default: return []
+        }
+    }
+    
+    var urlValue: URL {
+        switch self.type {
+        case .string:
+            return URL(string: rawString)!
+        default: fatalError() // This is obviously not sticking
+        }
+    }
+    
+    var int64Value: Int64 {
+        switch self.type {
+        case .int64: return rawInt64
+        default: fatalError()
         }
     }
 }
