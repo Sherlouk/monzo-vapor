@@ -1,4 +1,5 @@
-import S4
+import Vapor
+import HTTP
 import Foundation
 
 class MockResponder: Responder {
@@ -10,20 +11,15 @@ class MockResponder: Responder {
         self.lastRequest = request
         if let responseOverride = responseOverride { return responseOverride }
         
-        let data = S4.Data(try getMockData(for: request))
-        return Response(version: Version(major: 1, minor: 0),
-                        status: statusOverride,
-                        headers: Headers(),
-                        cookieHeaders: [],
-                        body: .buffer(data))
+        return try Response(status: statusOverride, json: try getMockData(for: request))
     }
     
-    func getMockData(for request: Request) throws -> String {
+    func getMockData(for request: Request) throws -> JSON {
         let parent = #file.components(separatedBy: "/").dropLast().joined(separator: "/")
         
         let pathRaw: String? = {
-            switch request.uri.path ?? "" {
-            case "accounts": return "accounts"
+            switch request.uri.path {
+            case "/accounts": return "accounts"
             default: return nil
             }
         }()
@@ -32,7 +28,7 @@ class MockResponder: Responder {
         guard let url = URL(string: "file://\(parent)/\(path).json") else { throw MockError.invalidUrl }
         guard let data = try? String(contentsOf: url, encoding: .utf8) else { throw MockError.noMockData }
         
-        return data
+        return try JSON(bytes: data.makeBytes())
     }
     
 }

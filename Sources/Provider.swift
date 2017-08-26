@@ -1,5 +1,6 @@
-import S4
 import Foundation
+import Vapor
+import HTTP
 
 final class Provider {
     
@@ -23,7 +24,7 @@ final class Provider {
     }
     
     func createRequest(_ req: Requests) throws -> Request {
-        let uri = URI(scheme: "https", host: "api.monzo.com", path: req.path, query: req.query)
+        let uri = URI(scheme: "https", hostname: "api.monzo.com", path: req.path, query: req.query)
         let version = Version(major: 1, minor: 0)
         
         return Request(method: req.method, uri: uri, version: version, headers: req.headers, body: req.body)
@@ -36,26 +37,24 @@ final class Provider {
         try validateResponseStatus(response.status)
     }
     
-    func request(_ req: Requests) throws -> JSONObject {
+    func request(_ req: Requests) throws -> JSON {
         let request = try createRequest(req)
         let response = try client.httpClient.respond(to: request)
-
+        
         try validateResponseStatus(response.status)
         
-        guard case .buffer(let data) = response.body else { throw ClientError.parsingError }
-        let foundationData = Foundation.Data(bytes: data.bytes)
-        let json = try JSONObject(data: foundationData)
-        
+        guard let json = response.json else { throw ClientError.other(0, "Oops") }
+
         if let nestedKey = req.nestedKey {
-            return json[nestedKey]
+            return json[nestedKey] ?? json
         }
         
         return json
     }
     
-    func requestArray(_ req: Requests) throws -> [JSONObject] {
-        guard let nestedKey = req.nestedKey else { throw ClientError.other(0, "Oops") }
-        return try request(req)[nestedKey].arrayValue
+    func requestArray(_ req: Requests) throws -> [JSON] {
+        guard let json = try request(req).array else { throw ClientError.other(0, "Oops") }
+        return json
     }
     
     private func validateResponseStatus(_ status: Status) throws {
@@ -118,7 +117,7 @@ extension Provider.Requests {
         }
     }
     
-    var method: S4.Method {
+    var method: HTTP.Method {
         switch self {
         case .updateTransaction: return .patch
         case .registerWebhook: return .post
@@ -148,23 +147,23 @@ extension Provider.Requests {
     }
     
     var body: Body {
-        let empty: Body = .buffer([])
+        let empty: Body = .init("")
         guard !params.isEmpty else { return empty }
         
         switch method {
         case .post, .patch:
             let string = params.map({ $0.encoded(.urlForm) }).joined(separator: "&")
-            guard let data = string.data(using: .utf8, allowLossyConversion: true) else { return empty }
-            return .buffer(S4.Data(data))
+//            guard let data = string.data(using: .utf8, allowLossyConversion: true) else { return empty }
+            return Body(string)
         default: return empty
         }
     }
     
-    var headers: Headers {
-        var builder = Headers()
+    var headers: [HeaderKey: String] {
+        var builder = [HeaderKey: String]()
         
         if let token = bearerToken {
-            builder["Authorization"] = "Bearer \(token)"
+            builder[.authorization] = "Bearer \(token)"
         }
         
         return builder
@@ -248,4 +247,15 @@ enum ClientError: Error {
         case .other(let code, let message): return "\(code): \(message)"
         }
     }
+}
+
+extension DateFormatter {
+    /// Monzo Data Formatter, based on ISO8601 without the milliseconds
+    @nonobjc public static let monzoiso8601: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssXXXXX"
+        return formatter
+    }()
 }

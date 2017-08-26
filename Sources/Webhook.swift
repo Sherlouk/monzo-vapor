@@ -1,4 +1,5 @@
 import Foundation
+import JSON
 
 public struct Webhook {
     public let id: String
@@ -11,10 +12,10 @@ public struct Webhook {
         self.url = url
     }
     
-    init(account: Account, json: JSONObject) {
+    init(account: Account, json: JSON) {
         self.account = account
-        self.id = json["id"].stringValue
-        self.url = json["url"].urlValue
+        self.id = json["id"]!.string!
+        self.url = json["url"]!.url!
     }
     
     /// Deletes the given webhook from the account

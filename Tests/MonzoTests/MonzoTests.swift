@@ -1,11 +1,10 @@
 import XCTest
-import S4
 @testable import Monzo
 
 class MonzoTests: XCTestCase {
     func testExample() {
         let responder = MockResponder()
-        let client = Monzo.Client(publicKey: "", privateKey: "", httpClient: responder)
+        let client = Client(publicKey: "", privateKey: "", httpClient: responder)
         let user = client.createUser(accessToken: "", refreshToken: nil)
         
         do {

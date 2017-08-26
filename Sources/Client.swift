@@ -1,5 +1,5 @@
-import S4
 import Foundation
+import Vapor
 
 public final class Client {
     let publicKey: String
@@ -11,9 +11,17 @@ public final class Client {
         self.publicKey = publicKey
         self.privateKey = privateKey
         self.httpClient = httpClient
+        
+        Monzo.setup()
     }
     
     public func createUser(accessToken: String, refreshToken: String?) -> User {
         return User(client: self, accessToken: accessToken, refreshToken: refreshToken)
+    }
+}
+
+final class Monzo {
+    static func setup() {
+        Date.incomingDateFormatters.insert(.monzoiso8601, at: 0)
     }
 }

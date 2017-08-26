@@ -1,4 +1,5 @@
 import Foundation
+import JSON
 
 public final class Account {
     public enum `Type` {
@@ -65,12 +66,12 @@ public final class Account {
         self.created = created
     }
     
-    init(user: User, json: JSONObject) throws {
+    init(user: User, json: JSON) throws {
         self.user = user
-        self.type = Type(rawValue: json["type"].stringValue)
-        self.id = json["id"].stringValue
-        self.description = json["description"].stringValue
-        self.created = json["created"].iso8601Value
+        self.type = Type(rawValue: json["type"]!.string!)
+        self.id = json["id"]!.string!
+        self.description = json["description"]!.string!
+        self.created = json["created"]!.date!
     }
     
     // MARK: Transactions
@@ -84,13 +85,13 @@ public final class Account {
     /// The current available balance of the account
     public func balance() throws -> Amount {
         let rawBalance = try user.client.provider.request(.balance(self))
-        return Amount(rawBalance["balance"].int64Value, currency: rawBalance["currency"].stringValue)
+        return try Amount(rawBalance["balance"]?.int64, currency: rawBalance["currency"]?.string)
     }
     
     /// The amount the account has spent today (Considered from approx. 4am onwards)
     public func spentToday() throws -> Amount {
         let rawBalance = try user.client.provider.request(.balance(self))
-        return Amount(rawBalance["spend_today"].int64Value, currency: rawBalance["currency"].stringValue)
+        return try Amount(rawBalance["spend_today"]?.int64, currency: rawBalance["currency"]?.string)
     }
     
     // MARK: Webhook
