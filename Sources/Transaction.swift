@@ -31,7 +31,7 @@ public struct Transaction {
     let settled: Date? // No Settled means authorised but not completed
     
     let notes: String
-    private(set) var metadata: [String: String]
+    private(set) var metadata: [String: String?]
     
     let category: String // Consider Enum?
     let merchant: Merchant
