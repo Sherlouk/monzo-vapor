@@ -14,9 +14,7 @@ public struct Amount {
 
     // MARK: - Initialiser
     
-    init(_ amount: Int64?, currency: String?) throws {
-        guard let amount = amount, let currency = currency else { throw ClientError.other(0, "Oops") }
-        
+    init(_ amount: Int64, currency: String) throws {
         self.amount = amount
         self.currency = currency
     }

@@ -12,10 +12,10 @@ public struct Webhook {
         self.url = url
     }
     
-    init(account: Account, json: JSON) {
+    init(account: Account, json: JSON) throws {
         self.account = account
-        self.id = json["id"]!.string!
-        self.url = json["url"]!.url!
+        self.id = try json.value(forKey: "id")
+        self.url = try json.value(forKey: "url")
     }
     
     /// Deletes the given webhook from the account

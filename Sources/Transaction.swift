@@ -1,4 +1,5 @@
 import Foundation
+import JSON
 
 public struct Transaction {
     enum DeclineReason {
@@ -23,8 +24,10 @@ public struct Transaction {
     /// Whether the transaction is an account topup
     var isTopup: Bool { return amount.amount > 0 && isLoad }
     
-    // TODO: Update Docs
-    /// Whether the transaction is a refund, or some other return
+    /// Whether the transaction is a refund
+    ///
+    /// A transaction is treated as a refund, if the amount is positive and it's not a topup.
+    /// This includes transactions such as refunds, reversals or chargebacks
     var isRefund: Bool { return amount.amount > 0 && !isLoad }
     
     let created: Date
@@ -36,16 +39,23 @@ public struct Transaction {
     let category: String // Consider Enum?
     let merchant: Merchant
     
+//    init(account: Account, json: JSON) throws {
+//        self.account = account
+//    }
+    
     // MARK: Metadata
     
-    mutating func setMetadata(_ value: String, forKey key: String) {
+    mutating func setMetadata(_ value: String?, forKey key: String) throws {
         metadata.updateValue(value, forKey: key)
-        // Send to Monzo
+        try account.user.client.provider.deliver(.updateTransaction(self))
+        
+        if value == nil {
+            metadata.removeValue(forKey: key)
+        }
     }
 
-    mutating func removeMetadata(forKey key: String) {
-        metadata.removeValue(forKey: key)
-        // Send to Monzo
+    mutating func removeMetadata(forKey key: String) throws {
+        try setMetadata(nil, forKey: key)
     }
     
     // MARK: Refresh

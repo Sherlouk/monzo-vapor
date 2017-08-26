@@ -68,10 +68,10 @@ public final class Account {
     
     init(user: User, json: JSON) throws {
         self.user = user
-        self.type = Type(rawValue: json["type"]!.string!)
-        self.id = json["id"]!.string!
-        self.description = json["description"]!.string!
-        self.created = json["created"]!.date!
+        self.type = Type(rawValue: try json.value(forKey: "type"))
+        self.id = try json.value(forKey: "id")
+        self.description = try json.value(forKey: "description")
+        self.created = try json.value(forKey: "created")
     }
     
     // MARK: Transactions
@@ -85,25 +85,26 @@ public final class Account {
     /// The current available balance of the account
     public func balance() throws -> Amount {
         let rawBalance = try user.client.provider.request(.balance(self))
-        return try Amount(rawBalance["balance"]?.int64, currency: rawBalance["currency"]?.string)
+        return try Amount(rawBalance.value(forKey: "balance"), currency: rawBalance.value(forKey: "currency"))
     }
     
     /// The amount the account has spent today (Considered from approx. 4am onwards)
     public func spentToday() throws -> Amount {
         let rawBalance = try user.client.provider.request(.balance(self))
-        return try Amount(rawBalance["spend_today"]?.int64, currency: rawBalance["currency"]?.string)
+        return try Amount(rawBalance.value(forKey: "spend_today"), currency: rawBalance.value(forKey: "currency"))
     }
     
     // MARK: Webhook
     
     private func loadWebhooks() throws {
         let rawWebhooks = try user.client.provider.requestArray(.webhooks(self))
-        _webhooks = rawWebhooks.map({ Webhook(account: self, json: $0) })
+        _webhooks = try rawWebhooks.map({ try Webhook(account: self, json: $0) })
     }
     
     public func addWebhook(url: URL) throws {
         let rawWebhook = try user.client.provider.request(.registerWebhook(self, url))
-        _webhooks.append(Webhook(account: self, json: rawWebhook))
+        let webhook = try Webhook(account: self, json: rawWebhook)
+        _webhooks.append(webhook)
     }
     
     public func removeWebhook(_ webhook: Webhook) throws {
