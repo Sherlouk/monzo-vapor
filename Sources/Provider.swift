@@ -14,7 +14,7 @@ final class Provider {
         case webhooks(Account)
         case registerWebhook(Account, URL)
         case deleteWebhook(Webhook)
-        case createFeedItem(Account, String) // WIP
+        case sendFeedItem(Account, FeedItem)
     }
     
     private let client: Client
@@ -25,9 +25,11 @@ final class Provider {
     
     func createRequest(_ req: Requests) throws -> Request {
         let uri = URI(scheme: "https", hostname: "api.monzo.com", path: req.path, query: req.query)
-        let version = Version(major: 1, minor: 0)
         
-        return Request(method: req.method, uri: uri, version: version, headers: req.headers, body: req.body)
+        let request = Request(method: req.method, uri: uri)
+        request.headers = req.headers
+        request.body = req.body
+        return request
     }
     
     func deliver(_ req: Requests) throws {
@@ -86,7 +88,7 @@ extension Provider.Requests {
         case .webhooks(let account): return account.user.accessToken
         case .registerWebhook(let account, _): return account.user.accessToken
         case .deleteWebhook(let webhook): return webhook.account.user.accessToken
-        case .createFeedItem(let account, _): return account.user.accessToken
+        case .sendFeedItem(let account, _): return account.user.accessToken
         }
     }
     
@@ -101,7 +103,7 @@ extension Provider.Requests {
         case .webhooks: return "webhooks"
         case .registerWebhook: return "webhooks"
         case .deleteWebhook(let webhook): return "webhooks/\(webhook.id)"
-        case .createFeedItem: return "feed"
+        case .sendFeedItem: return "feed"
         }
     }
     
@@ -122,7 +124,7 @@ extension Provider.Requests {
         case .updateTransaction: return .patch
         case .registerWebhook: return .post
         case .deleteWebhook: return .delete
-        case .createFeedItem: return .post
+        case .sendFeedItem: return .post
         default: return .get
         }
     }
@@ -134,7 +136,18 @@ extension Provider.Requests {
         case .updateTransaction(let transaction): return [.dictionary("metadata", transaction.metadata)]
         case .webhooks(let account): return [.account(account)]
         case .registerWebhook(let account, let url): return [.account(account), .basic("url", url.absoluteString)]
-        case .createFeedItem: return [.basic("WIP", "")]
+        case .sendFeedItem(let account, let feedItem):
+            var builder: [Parameters] = [
+                .account(account),
+                .basic("type", feedItem.type),
+                .dictionary("params", feedItem.params)
+            ]
+            
+            if let url = feedItem.url {
+                builder.append(.basic("url", url.absoluteString))
+            }
+            
+            return builder
         default: return []
         }
     }
@@ -153,7 +166,6 @@ extension Provider.Requests {
         switch method {
         case .post, .patch:
             let string = params.map({ $0.encoded(.urlForm) }).joined(separator: "&")
-//            guard let data = string.data(using: .utf8, allowLossyConversion: true) else { return empty }
             return Body(string)
         default: return empty
         }

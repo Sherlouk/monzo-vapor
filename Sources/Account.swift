@@ -111,4 +111,10 @@ public final class Account {
         guard let index = _webhooks.index(where: { $0.id == webhook.id }) else { return }
         _webhooks.remove(at: index)
     }
+    
+    // MARK: Feed Item
+    
+    public func sendFeedItem(_ feedItem: BasicFeedItem) throws {
+        try user.client.provider.deliver(.sendFeedItem(self, feedItem))
+    }
 }
