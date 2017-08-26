@@ -13,7 +13,7 @@ public final class Client {
         self.httpClient = httpClient
     }
     
-    func createUser(accessToken: String, refreshToken: String?) -> User {
+    public func createUser(accessToken: String, refreshToken: String?) -> User {
         return User(client: self, accessToken: accessToken, refreshToken: refreshToken)
     }
 }

@@ -1,9 +1,9 @@
 import Foundation
 
 public struct Webhook {
-    let id: String
-    let url: URL
-    internal let account: Account
+    public let id: String
+    public let url: URL
+    let account: Account
     
     init(account: Account, id: String, url: URL) {
         self.account = account
@@ -20,7 +20,7 @@ public struct Webhook {
     /// Deletes the given webhook from the account
     ///
     /// The URL will no longer receive updates
-    func remove() throws {
+    public func remove() throws {
         try account.removeWebhook(self)
     }
 }
