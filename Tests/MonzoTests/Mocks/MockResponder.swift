@@ -4,13 +4,18 @@ import Foundation
 class MockResponder: Responder {
     var responseOverride: Response?
     var lastRequest: Request?
+    var statusOverride: Status = .ok
     
     func respond(to request: Request) throws -> Response {
         self.lastRequest = request
         if let responseOverride = responseOverride { return responseOverride }
         
         let data = S4.Data(try getMockData(for: request))
-        return Response(version: Version(major: 1, minor: 0), status: .ok, headers: Headers(), cookieHeaders: [], body: .buffer(data))
+        return Response(version: Version(major: 1, minor: 0),
+                        status: statusOverride,
+                        headers: Headers(),
+                        cookieHeaders: [],
+                        body: .buffer(data))
     }
     
     func getMockData(for request: Request) throws -> String {

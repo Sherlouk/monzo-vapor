@@ -1,0 +1,9 @@
+{
+  "webhooks": [
+    {
+      "id": "webhook_00009NeEJaAJoidC1mjvXd",
+      "account_id": "acc_00009CyB7RYp3pXNy1dCc5",
+      "url": "https://monzo.com"
+    }
+  ]
+}

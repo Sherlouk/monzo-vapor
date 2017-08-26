@@ -15,7 +15,7 @@ public final class User {
     
     func accounts() throws -> [Account] {
         // Current API (by default) returns prepaid accounts, should also add a way to find current accounts
-        let rawAccounts: [Client.JSONObject] = try client.makeRequest(path: "accounts").value(forKey: "accounts")
-        return try rawAccounts.map({ try Account.init(user: self, json: $0) })
+        let rawAccounts = try client.provider.requestArray(.listAccounts(self))
+        return try rawAccounts.map({ try Account(user: self, json: $0) })
     }
 }

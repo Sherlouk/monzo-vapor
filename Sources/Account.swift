@@ -62,12 +62,12 @@ public final class Account {
         self.created = created
     }
     
-    init(user: User, json: Client.JSONObject) throws {
+    init(user: User, json: JSONObject) throws {
         self.user = user
-        self.type = try Type(rawValue: json.value(forKey: "type"))
-        self.id = try json.value(forKey: "id")
-        self.description = try json.value(forKey: "description")
-        self.created = try json.dateValue(forKey: "created")
+        self.type = Type(rawValue: json["type"].stringValue)
+        self.id = json["id"].stringValue
+        self.description = json["description"].stringValue
+        self.created = json["created"].iso8601Value
     }
     
     // MARK: Transactions

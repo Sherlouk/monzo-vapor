@@ -5,6 +5,7 @@ public final class Client {
     let publicKey: String
     let privateKey: String
     let httpClient: Responder
+    lazy var provider: Provider = { return Provider(client: self) }()
     
     public init(publicKey: String, privateKey: String, httpClient: Responder) {
         self.publicKey = publicKey
@@ -19,11 +20,9 @@ public final class Client {
 
 extension Client {
     
-    typealias JSONObject = [String: Any]
-    
-    func makeRequest(method: S4.Method = .get, path: String) throws -> JSONObject {
+    func makeRequest(method: S4.Method = .get, path: String, headers: Headers = Headers()) throws -> JSONObject {
         let uri = URI(scheme: "https", host: "api.monzo.com", path: path)
-        let request = Request(method: method, uri: uri, version: Version(major: 1, minor: 0), headers: Headers(), body: .buffer([]))
+        let request = Request(method: method, uri: uri, version: Version(major: 1, minor: 0), headers: headers, body: .buffer([]))
         return try makeRequest(request)
     }
     
@@ -33,10 +32,7 @@ extension Client {
         
         guard case .buffer(let data) = response.body else { throw ClientError.parsingError }
         let foundationData = Foundation.Data(bytes: data.bytes)
-        let json = try JSONSerialization.jsonObject(with: foundationData, options: .init(rawValue: 0))
-        
-        guard let object = json as? JSONObject else { throw ClientError.parsingError }
-        return object
+        return try JSONObject(data: foundationData)
     }
     
     private func validateResponseStatus(_ status: Status) throws {
@@ -55,21 +51,6 @@ extension Client {
         }
     }
     
-}
-
-protocol StringProtocol { }
-extension String : StringProtocol { }
-extension Dictionary where Key: StringProtocol {
-    func value<T>(forKey key: Key) throws -> T {
-        guard let value = self[key] as? T else { print("hmm?"); throw ClientError.parsingError }
-        return value
-    }
-    
-    func dateValue(forKey key: Key) throws -> Date {
-        guard let value = self[key] as? String else { throw ClientError.parsingError }
-        guard let date = DateFormatter.iso8601Formatter().date(from: value) else { throw ClientError.parsingError }
-        return date
-    }
 }
 
 extension DateFormatter {
