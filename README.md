@@ -1,8 +1,5 @@
 > WORK IN PROGRESS - DO NOT USE
 
-- Add pagination to transactions flow
-- Add an attachments flow to transactions
-- Add all the authentication flow
 - Add tests to all calls
 - Tidy up GitHub versions, make the working version 1
 - Documentation sweep
@@ -53,7 +50,28 @@ let client = MonzoClient(publicKey: "...", privateKey: "...", httpClient: Drople
 
 ### Authenticate a user
 
-> Incomplete
+If the user hasn't authorised your client, then you will need to redirect them to Monzo first.
+
+```swift
+let client = MonzoClient(publicKey: "...", privateKey: "...", httpClient: Droplet.client)
+let uri = client.authorizationURI(redirectUrl: "...", nonce: "...")
+// Redirect user to URI
+```
+
+> While a nonce is not required, we highly recommend providing a secure and random string to prevent [CSRF attacks](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29)!
+
+Once the user authorises your client, they will be redirected to the provided URL.
+You will need to setup a route for this URL, and exchange the token - I provide a helpful function for this!
+
+```swift
+// Replace this to match the redirectURL
+builder.get("oauth/callback") { req in
+  // Forward the request, which will in turn validate and exchange the token
+  let user = try client.authenticateUser(req, nonce: "...")
+}
+```
+
+> When authenticating a user, you need to ensure the nonce matches the one used in the previous step.
 
 ### Load Accounts
 
@@ -91,28 +109,47 @@ Feed items must be of high value to the user, and while the appearance is custom
 let feedItem = BasicFeedItem(title: "...", imageUrl: "...")
 
 // There are also some optional parameters for further customisation
-let feedItem = BasicFeedItem(..., openUrl: "...",
-                                  body: "...",
-                                  options: [
-                                    .backgroundColor("#ABCDEF"),
-                                    .titleColor("#ABCDEF"),
-                                    .bodyColor("#ABCDEF")
-                                  ])
+let feedItem = BasicFeedItem(title: "...",
+                            imageUrl: "...",
+                            openUrl: "...",
+                            body: "...",
+                            options: [
+                              .backgroundColor("#ABCDEF"),
+                              .titleColor("#ABCDEF"),
+                              .bodyColor("#ABCDEF")
+                            ])
 
 try account.sendFeedItem(feedItem)
 ```
 
 ### Webhooks
 
-> Incomplete
+Webhooks can be used to receive real-time, push notifications of events in an account.
+
+Currently they are only used for new transactions, see [the docs here](https://monzo.com/docs/#transaction-created)!
+
+```swift
+// If you haven't previously loaded webhooks, this will fetch them and then return them
+try account.webhooks
+
+// Register Webhook
+try account.addWebhook(url: "...")
+
+// Remove Webhook
+try webhook.remove()
+```
 
 ### Attachments
 
-> Incomplete
+> Attachments are currently not supported
 
 ### Error Handling
 
-> Incomplete
+All network requests are designed to throw detailed error messages in the event of something going wrong.
+
+All errors conform to [Debuggable](https://docs.vapor.codes/2.0/debugging/overview/) allowing you to easily debug what's gone wrong.
+
+If in doubt, please raise an issue on GitHub!
 
 ### Ping
 

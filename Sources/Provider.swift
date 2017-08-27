@@ -16,6 +16,7 @@ final class Provider {
         case deleteWebhook(Webhook)
         case sendFeedItem(Account, FeedItem)
         case refreshToken(User)
+        case exchangeToken(MonzoClient, URL, String)
     }
     
     private let client: MonzoClient
@@ -98,7 +99,7 @@ final class Provider {
 extension Provider.Requests {
     var bearerToken: String? {
         switch self {
-        case .ping, .refreshToken: return nil
+        case .ping, .refreshToken, .exchangeToken: return nil
         case .listAccounts(let user, _): return user.accessToken
         case .balance(let account): return account.user.accessToken
         case .transactions(let account, _): return account.user.accessToken
@@ -123,7 +124,7 @@ extension Provider.Requests {
         case .registerWebhook: return "webhooks"
         case .deleteWebhook(let webhook): return "webhooks/\(webhook.id)"
         case .sendFeedItem: return "feed"
-        case .refreshToken: return "oauth2/token"
+        case .refreshToken, .exchangeToken: return "oauth2/token"
         }
     }
     
@@ -145,7 +146,7 @@ extension Provider.Requests {
         case .registerWebhook: return .post
         case .deleteWebhook: return .delete
         case .sendFeedItem: return .post
-        case .refreshToken: return .post
+        case .refreshToken, .exchangeToken: return .post
         default: return .get
         }
     }
@@ -188,6 +189,12 @@ extension Provider.Requests {
                     .basic("client_id", user.client.publicKey),
                     .basic("client_secret", user.client.privateKey),
                     .basic("refresh_token", refreshToken)]
+        case .exchangeToken(let client, let url, let code):
+            return [.basic("grant_type", "authorization_code"),
+                    .basic("client_id", client.publicKey),
+                    .basic("client_secret", client.privateKey),
+                    .basic("redirect_uri", url.absoluteString),
+                    .basic("code", code)]
         default: return []
         }
     }

@@ -152,3 +152,32 @@ extension MonzoUsageError: Debuggable {
         }
     }
 }
+
+public enum MonzoAuthError: Error {
+    case missingParameters
+    case conflictedNonce
+}
+
+extension MonzoAuthError: Debuggable {
+    public var identifier: String {
+        switch self {
+        case .missingParameters: return "missingParameters"
+        case .conflictedNonce: return "conflictedNonce"
+        }
+    }
+    
+    public var reason: String {
+        switch self {
+        case .missingParameters: return "Authentication request doesn't contain either a code or state"
+        case .conflictedNonce: return "Nonce does not match the original"
+        }
+    }
+    
+    public var suggestedFixes: [String] {
+        return []
+    }
+    
+    public var possibleCauses: [String] {
+        return []
+    }
+}

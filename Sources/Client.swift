@@ -40,6 +40,42 @@ public final class MonzoClient {
         let response: String? = try? provider.request(.ping).value(forKey: "ping")
         return response == "pong"
     }
+    
+    /// Creates a URI to Monzo's authorisation page, you should redirect users to it in order to authorise usage of their accounts
+    ///
+    /// - Parameters:
+    ///   - redirectUrl: The URL that Monzo will redirect the user back to, where you should validate and obtain the access token
+    ///   - nonce: An unguessable/random string to prevent against CSRF attacks. Optional, but **recommended**!
+    /// - Returns: The URI to redirect users to
+    public func authorizationURI(redirectUrl: URL, nonce: String?) -> URI {
+        var parameters: [Parameters] = [
+            .basic("client_id", publicKey),
+            .basic("redirect_uri", redirectUrl.absoluteString),
+            .basic("response_type", "code")
+        ]
+        
+        if let nonce = nonce { parameters.append(.basic("code", nonce)) }
+        let query = parameters.map({ $0.encoded(.urlQuery) }).joined(separator: "&")
+        
+        return URI(scheme: "https", hostname: "auth.getmondo.co.uk", query: query)
+    }
+    
+    public func authenticateUser(_ req: Request, nonce: String?) throws -> User {
+        guard let code = req.query?["code"]?.string else { throw MonzoAuthError.missingParameters }
+        
+        if let state = req.query?["state"]?.string {
+            guard state == nonce else { throw MonzoAuthError.conflictedNonce }
+        } else if nonce != nil {
+            throw MonzoAuthError.missingParameters
+        }
+        
+        let url = try req.uri.makeFoundationURL()
+        let response = try provider.request(.exchangeToken(self, url, code))
+        
+        let accessToken: String = try response.value(forKey: "access_token")
+        let refreshToken: String? = try? response.value(forKey: "refresh_token")
+        return createUser(accessToken: accessToken, refreshToken: refreshToken)
+    }
 }
 
 final class Monzo {
