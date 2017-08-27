@@ -7,6 +7,21 @@ public final class MonzoClient {
     let httpClient: Responder
     lazy var provider: Provider = { return Provider(client: self) }()
     
+    public convenience init(publicKey: String, privateKey: String, clientFactory: ClientFactoryProtocol) {
+        let responder: Responder = {
+            // Attempt to re-use the same client (better performance)
+            if let port = URI.defaultPorts["https"],
+                let client = try? clientFactory.makeClient(hostname: "api.monzo.com", port: port, securityLayer: .none) {
+                return client
+            }
+            
+            // Default Implementation (Will create a new client for every request)
+            return clientFactory
+        }()
+        
+        self.init(publicKey: publicKey, privateKey: privateKey, httpClient: responder)
+    }
+    
     public init(publicKey: String, privateKey: String, httpClient: Responder) {
         self.publicKey = publicKey
         self.privateKey = privateKey
