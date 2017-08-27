@@ -2,9 +2,13 @@ import Foundation
 import JSON
 
 public struct Webhook {
-    public let id: String
-    public let url: URL
     let account: Account
+    
+    /// The ID of the webhook
+    public let id: String
+    
+    /// Where webhook events will be sent to
+    public let url: URL
     
     init(account: Account, json: JSON) throws {
         self.account = account

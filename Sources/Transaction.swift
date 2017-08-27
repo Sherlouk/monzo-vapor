@@ -86,7 +86,9 @@ public final class Transaction {
     public let id: String
     public let description: String
     
+    /// How much the transaction was for, this will often be a negative value for monies spent
     public let amount: Amount
+    
     private let isLoad: Bool
     
     /// Whether the transaction is an account topup
@@ -98,17 +100,30 @@ public final class Transaction {
     /// This includes transactions such as refunds, reversals or chargebacks
     public var isRefund: Bool { return amount.amount > 0 && !isLoad }
     
+    /// Why, if at all, the transaction was declined
     public let declineReason: DeclineReason?
+    
+    /// Whether or not the transaction was declined. See `declineReason`.
     public var declined: Bool { return declineReason != nil }
     
+    /// When the transaction was first created
     public let created: Date
-    public let settled: Date? // No Settled means authorised but not completed
     
+    /// When the transaction was settled.
+    ///
+    /// If nil, the transaction has been authorised but not completed
+    public let settled: Date?
+    
+    /// User defined notes on the transaction
     public let notes: String
+    
+    /// Metadata is per-client and will not be shared with other clients
     private(set) public var metadata: [String: String?]
     
+    /// Category for this transaction
     public let category: Category
     
+    /// The ID of the merchant, fallback if merchant info isn't expanded
     public let merchantId: String?
     
     /// Information about the merchant
@@ -145,9 +160,10 @@ public final class Transaction {
         }
     }
     
-    // MARK: Metadata
+    // MARK: - Metadata
     
-    func setMetadata(_ value: String?, forKey key: String) throws {
+    /// Add an annotation on this key, if the value is nil then the key will be removed
+    public func setMetadata(_ value: String?, forKey key: String) throws {
         metadata.updateValue(value, forKey: key)
         try account.user.client.provider.deliver(.updateTransaction(self), user: account.user)
         
@@ -156,11 +172,12 @@ public final class Transaction {
         }
     }
 
-    func removeMetadata(forKey key: String) throws {
+    /// Remove an annotation on this transaction
+    public func removeMetadata(forKey key: String) throws {
         try setMetadata(nil, forKey: key)
     }
     
-    // MARK: Refresh
+    // MARK: - Refresh
     
     func refresh() {
         // Update all values by making a new network request for the ID (the only constant)
