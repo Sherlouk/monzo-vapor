@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-brew install openssl
-brew install ctls
+brew tap vapor/homebrew-tap
+brew update
+brew install vapor
 
 swift package generate-xcodeproj
