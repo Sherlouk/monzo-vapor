@@ -1,7 +1,7 @@
 import Foundation
 import JSON
 
-public struct Transaction {
+public final class Transaction {
     public enum DeclineReason: CustomStringConvertible {
         case insufficientFunds
         case cardInactive
@@ -147,7 +147,7 @@ public struct Transaction {
     
     // MARK: Metadata
     
-    mutating func setMetadata(_ value: String?, forKey key: String) throws {
+    func setMetadata(_ value: String?, forKey key: String) throws {
         metadata.updateValue(value, forKey: key)
         try account.user.client.provider.deliver(.updateTransaction(self))
         
@@ -156,14 +156,20 @@ public struct Transaction {
         }
     }
 
-    mutating func removeMetadata(forKey key: String) throws {
+    func removeMetadata(forKey key: String) throws {
         try setMetadata(nil, forKey: key)
     }
     
     // MARK: Refresh
     
-    mutating func refresh() {
+    func refresh() {
         // Update all values by making a new network request for the ID (the only constant)
 //        let rawTransaction = try account.user.client.provider.request(.transaction(account, id))
+    }
+}
+
+extension Transaction: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        return "Transaction(\(id))"
     }
 }

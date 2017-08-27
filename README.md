@@ -1,13 +1,11 @@
 > WORK IN PROGRESS - DO NOT USE
 
-- Setup proper error enums, which conform to Debuggable (Vapor)
 - Add pagination to transactions flow
 - Add an attachments flow to transactions
 - Add all the authentication flow
 - Add tests to all calls
 - Look into a working CI solution (Buddybuild doesn't seem to like Linux builds)
 - Tidy up GitHub versions, make the working version 1
-- Add descriptions to all elements for easier printing/debugging
 - Add security to all endpoints to ensure values meet criteria (e.g. feed item must have a non empty title)
     - Maybe use Vapor's "Validation" feature? dunno
 - Documentation sweep

@@ -22,3 +22,9 @@ public struct Merchant {
         self.category = .init(rawValue: try json.value(forKey: "category"))
     }
 }
+
+extension Merchant: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        return "Merchant(\(id): \(name))"
+    }
+}

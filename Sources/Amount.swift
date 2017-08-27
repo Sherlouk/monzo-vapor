@@ -20,8 +20,8 @@ public struct Amount {
     }
 }
 
-extension Amount: CustomStringConvertible {
-    public var description: String {
-        return "\(amount) \(currency)"
+extension Amount: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        return "Amount(\(amount) \(currency))"
     }
 }

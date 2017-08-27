@@ -11,7 +11,7 @@ class AmountTests: XCTestCase {
     
     func testDescription() {
         let amount = Amount(100, currency: "GBP")
-        XCTAssertEqual(amount.description, "100 GBP")
+        XCTAssertEqual(amount.debugDescription, "Amount(100 GBP)")
     }
     
     func testAccountBalanceResponse() {

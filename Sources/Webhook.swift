@@ -19,3 +19,9 @@ public struct Webhook {
         try account.removeWebhook(self)
     }
 }
+
+extension Webhook: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        return "Webhook(\(id): \(url.absoluteString))"
+    }
+}
