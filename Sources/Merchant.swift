@@ -12,7 +12,8 @@ public struct Merchant {
     // Consider using CoreLocation CLPlacemark to store location/address/etc?
     
     init(json: JSON?) throws {
-        guard let json = json else { throw ClientError.other(0, "") }
+        guard let json = json else { throw MonzoJSONError.missingJSON }
+        
         self.id = try json.value(forKey: "id")
         self.name = try json.value(forKey: "name")
         self.emoji = try json.value(forKey: "emoji")

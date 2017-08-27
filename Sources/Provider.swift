@@ -45,34 +45,34 @@ final class Provider {
         
         try validateResponseStatus(response.status)
         
-        guard let json = response.json else { throw ClientError.other(0, "Oops") }
+        guard let json = response.json else { throw MonzoJSONError.missingJSON }
 
         if let nestedKey = req.nestedKey {
-            return json[nestedKey] ?? json
+            if let nestedJSON = json[nestedKey] {
+                return nestedJSON
+            }
+            
+            throw MonzoJSONError.missingNestedEntry(nestedKey)
         }
         
         return json
     }
     
     func requestArray(_ req: Requests) throws -> [JSON] {
-        guard let json = try request(req).array else { throw ClientError.other(0, "Oops") }
+        guard let json = try request(req).array else { throw MonzoJSONError.missingJSON }
         return json
     }
     
     private func validateResponseStatus(_ status: Status) throws {
-        switch status.statusCode {
-        case 200: break // OK
-        case 400: throw ClientError.badRequest
-        case 401: throw ClientError.unauthorised
-        case 403: throw ClientError.forbidden
-        case 405: throw ClientError.methodNotAllowed
-        case 404: throw ClientError.notFound
-        case 406: throw ClientError.notAcceptable
-        case 429: throw ClientError.tooManyRequests
-        case 500: throw ClientError.internalError
-        case 504: throw ClientError.gatewayTimeout
-        default: throw ClientError.other(status.statusCode, status.reasonPhrase)
+        if status.statusCode == 200 {
+            return
         }
+        
+        if let error = MonzoAPIError(statusCode: status.statusCode) {
+            throw error
+        }
+        
+        throw MonzoAPIError.other(status.statusCode, status.reasonPhrase)
     }
 }
 
@@ -239,36 +239,6 @@ enum Parameters {
             return array.map({ (arrayValue) in
                 return "\(keyEncoded)[]=\(encoder.encode(arrayValue))"
             }).joined(separator: "&")
-        }
-    }
-}
-
-enum ClientError: Error {
-    case badRequest // Missing Arguments or Malformed Request
-    case unauthorised // User is not authenticated
-    case forbidden // Request is authenticated, but doesn't have sufficient priviledges
-    case methodNotAllowed // Incorrect HTTP verb, check correct usage of POST/GET/DELETE/etc
-    case notFound // Endpoint requested does not exist
-    case notAcceptable // Your application does not accept the content format returned according to the Accept headers sent in the request
-    case tooManyRequests // Your application is exceeding its rate limit
-    case internalError // Something is wrong on Monzo's end
-    case gatewayTimeout // Something has timed out on Monzo's end
-    case parsingError // Failed to create JSON from response
-    case other(Int, String)
-    
-    var localizedDescription: String {
-        switch self {
-        case .badRequest: return "Missing Arguments or Malformed Request"
-        case .unauthorised: return "User is not authenticated"
-        case .forbidden: return "Request is authenticated, but doesn't have sufficient priviledges"
-        case .methodNotAllowed: return "Incorrect HTTP verb, check correct usage of POST/GET/DELETE/etc"
-        case .notFound: return "Endpoint requested does not exist"
-        case .notAcceptable: return "Your application does not accept the content format returned according to the Accept headers sent in the request"
-        case .tooManyRequests: return "Your application is exceeding its rate limit"
-        case .internalError: return "Something is wrong on Monzo's end"
-        case .gatewayTimeout: return "Something has timed out on Monzo's end"
-        case .parsingError: return "Failed to create JSON from response"
-        case .other(let code, let message): return "\(code): \(message)"
         }
     }
 }

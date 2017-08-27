@@ -10,7 +10,11 @@ extension JSON {
         if T.self is Date.Type, let value = self[key]?.date as? T { return value }
         if T.self is Int.Type, let value = self[key]?.int as? T { return value }
         
-        throw ClientError.other(1, ":(")
+        if self[key] != nil {
+            throw MonzoJSONError.unsupportedType(String(describing: T.self))
+        }
+        
+        throw MonzoJSONError.missingKey(key)
     }
     
 }
