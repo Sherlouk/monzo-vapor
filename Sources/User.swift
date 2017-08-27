@@ -1,13 +1,13 @@
 
 public final class User {
-    var client: Client
+    var client: MonzoClient
     
     // Authorisation
     let accessToken: String
     let refreshToken: String?
     
     // Initaliser
-    init(client: Client, accessToken: String, refreshToken: String?) {
+    init(client: MonzoClient, accessToken: String, refreshToken: String?) {
         self.client = client
         self.accessToken = accessToken
         self.refreshToken = refreshToken

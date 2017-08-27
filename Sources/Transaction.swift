@@ -37,11 +37,24 @@ public struct Transaction {
     private(set) var metadata: [String: String?]
     
     let category: String // Consider Enum?
-    let merchant: Merchant
+//    let merchant: Merchant
     
-//    init(account: Account, json: JSON) throws {
-//        self.account = account
-//    }
+    init(account: Account, json: JSON) throws {
+        self.account = account
+        self.declineReason = nil
+        self.id = try json.value(forKey: "id")
+        self.description = try json.value(forKey: "description")
+        self.amount = try Amount(json.value(forKey: "amount"), currency: json.value(forKey: "currency"))
+        self.isLoad = try json.value(forKey: "is_load")
+        self.created = try json.value(forKey: "created")
+        self.notes = try json.value(forKey: "notes")
+        self.settled = try? json.value(forKey: "settled")
+        self.category = try json.value(forKey: "category")
+        self.metadata = [String: String?]()
+        json["metadata"]?.object?.forEach {
+            self.metadata[$0.key] = $0.value.string
+        }
+    }
     
     // MARK: Metadata
     

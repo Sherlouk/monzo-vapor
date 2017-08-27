@@ -4,7 +4,7 @@ import XCTest
 class MonzoTests: XCTestCase {
     func testExample() {
         let responder = MockResponder()
-        let client = Client(publicKey: "", privateKey: "", httpClient: responder)
+        let client = MonzoClient(publicKey: "", privateKey: "", httpClient: responder)
         let user = client.createUser(accessToken: "", refreshToken: nil)
         
         do {

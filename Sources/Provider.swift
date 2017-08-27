@@ -17,9 +17,9 @@ final class Provider {
         case sendFeedItem(Account, FeedItem)
     }
     
-    private let client: Client
+    private let client: MonzoClient
     
-    init(client: Client) {
+    init(client: MonzoClient) {
         self.client = client
     }
     

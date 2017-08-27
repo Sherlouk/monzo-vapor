@@ -76,8 +76,9 @@ public final class Account {
     
     // MARK: Transactions
     
-    public func transactions(limit: Int = 10) -> [Transaction] {
-        return []
+    public func transactions() throws -> [Transaction] {
+        let rawTransactions = try user.client.provider.request(.transactions(self))
+        return try rawTransactions.array?.map({ try Transaction(account: self, json: $0) }) ?? []
     }
     
     // MARK: Balance
