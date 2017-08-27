@@ -117,3 +117,38 @@ extension MonzoJSONError: Debuggable {
         return []
     }
 }
+
+public enum MonzoUsageError: Error {
+    case noRefreshToken
+    case invalidFeedItem
+}
+
+extension MonzoUsageError: Debuggable {
+    public var identifier: String {
+        switch self {
+        case .noRefreshToken: return "noRefreshToken"
+        case .invalidFeedItem: return "invalidFeedItem"
+        }
+    }
+    
+    public var reason: String {
+        switch self {
+        case .noRefreshToken: return "Tried to refresh the access token with no refresh token!"
+        case .invalidFeedItem: return "Feed Item was invalid"
+        }
+    }
+    
+    public var suggestedFixes: [String] {
+        switch self {
+        case .noRefreshToken: return ["Provide a refresh token", "Don't attempt to refresh the access token"]
+        case .invalidFeedItem: return ["Ensure all necessary values are there"]
+        }
+    }
+    
+    public var possibleCauses: [String] {
+        switch self {
+        case .noRefreshToken: return ["\"refreshAccessToken\" was called with no refresh token"]
+        case .invalidFeedItem: return ["Your feed item title is likely an empty string"]
+        }
+    }
+}

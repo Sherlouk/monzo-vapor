@@ -15,6 +15,7 @@ final class Provider {
         case registerWebhook(Account, URL)
         case deleteWebhook(Webhook)
         case sendFeedItem(Account, FeedItem)
+        case refreshToken(User)
     }
     
     private let client: MonzoClient
@@ -32,16 +33,24 @@ final class Provider {
         return request
     }
     
-    func deliver(_ req: Requests) throws {
+    func deliver(_ req: Requests, user: User? = nil, allowRefresh: Bool = true) throws {
         let request = try createRequest(req)
         let response = try client.httpClient.respond(to: request)
+        
+        if allowRefresh, try refreshTokenIfNeeded(response, user: user) {
+            return try deliver(req, user: user, allowRefresh: false)
+        }
         
         try validateResponseStatus(response.status)
     }
     
-    func request(_ req: Requests) throws -> JSON {
+    func request(_ req: Requests, user: User? = nil, allowRefresh: Bool = true) throws -> JSON {
         let request = try createRequest(req)
         let response = try client.httpClient.respond(to: request)
+        
+        if allowRefresh, try refreshTokenIfNeeded(response, user: user) {
+            return try self.request(req, user: user, allowRefresh: false)
+        }
         
         try validateResponseStatus(response.status)
         
@@ -58,8 +67,8 @@ final class Provider {
         return json
     }
     
-    func requestArray(_ req: Requests) throws -> [JSON] {
-        guard let json = try request(req).array else { throw MonzoJSONError.missingJSON }
+    func requestArray(_ req: Requests, user: User? = nil) throws -> [JSON] {
+        guard let json = try request(req, user: user).array else { throw MonzoJSONError.missingJSON }
         return json
     }
     
@@ -74,12 +83,22 @@ final class Provider {
         
         throw MonzoAPIError.other(status.statusCode, status.reasonPhrase)
     }
+    
+    func refreshTokenIfNeeded(_ response: Response, user: User?) throws -> Bool {
+        guard let user = user, user.autoRefreshToken else { return false }
+        guard user.refreshToken != nil else { return false }
+        guard response.status.statusCode != 200 else { return false }
+        guard response.json?["error"]?.string == "invalid_token" else { return false }
+        
+        try user.refreshAccessToken()
+        return true
+    }
 }
 
 extension Provider.Requests {
     var bearerToken: String? {
         switch self {
-        case .ping: return nil
+        case .ping, .refreshToken: return nil
         case .listAccounts(let user, _): return user.accessToken
         case .balance(let account): return account.user.accessToken
         case .transactions(let account, _): return account.user.accessToken
@@ -104,6 +123,7 @@ extension Provider.Requests {
         case .registerWebhook: return "webhooks"
         case .deleteWebhook(let webhook): return "webhooks/\(webhook.id)"
         case .sendFeedItem: return "feed"
+        case .refreshToken: return "oauth2/token"
         }
     }
     
@@ -125,6 +145,7 @@ extension Provider.Requests {
         case .registerWebhook: return .post
         case .deleteWebhook: return .delete
         case .sendFeedItem: return .post
+        case .refreshToken: return .post
         default: return .get
         }
     }
@@ -160,6 +181,13 @@ extension Provider.Requests {
             }
             
             return builder
+        case .refreshToken(let user):
+            guard let refreshToken = user.refreshToken else { return [] }
+            
+            return [.basic("grant_type", "refresh_token"),
+                    .basic("client_id", user.client.publicKey),
+                    .basic("client_secret", user.client.privateKey),
+                    .basic("refresh_token", refreshToken)]
         default: return []
         }
     }

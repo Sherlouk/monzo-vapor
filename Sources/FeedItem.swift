@@ -4,6 +4,7 @@ protocol FeedItem {
     var type: String { get }
     var params: [String: String] { get }
     var url: URL? { get }
+    func validate() throws
 }
 
 public struct BasicFeedItem: FeedItem {
@@ -43,6 +44,12 @@ public struct BasicFeedItem: FeedItem {
         }
         
         return builder
+    }
+    
+    func validate() throws {
+        if title.trimmingCharacters(in: .whitespacesAndNewlines) == "" {
+            throw MonzoUsageError.invalidFeedItem
+        }
     }
 }
 

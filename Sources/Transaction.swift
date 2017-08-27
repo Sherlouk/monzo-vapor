@@ -149,7 +149,7 @@ public final class Transaction {
     
     func setMetadata(_ value: String?, forKey key: String) throws {
         metadata.updateValue(value, forKey: key)
-        try account.user.client.provider.deliver(.updateTransaction(self))
+        try account.user.client.provider.deliver(.updateTransaction(self), user: account.user)
         
         if value == nil {
             metadata.removeValue(forKey: key)

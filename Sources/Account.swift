@@ -69,7 +69,7 @@ public final class Account {
     // MARK: Transactions
     
     public func transactions(merchantInfo: Bool = true) throws -> [Transaction] {
-        let rawTransactions = try user.client.provider.request(.transactions(self, merchantInfo))
+        let rawTransactions = try user.client.provider.request(.transactions(self, merchantInfo), user: user)
         return try rawTransactions.array?.map({ try Transaction(account: self, json: $0) }) ?? []
     }
     
@@ -77,31 +77,31 @@ public final class Account {
     
     /// The current available balance of the account
     public func balance() throws -> Amount {
-        let rawBalance = try user.client.provider.request(.balance(self))
+        let rawBalance = try user.client.provider.request(.balance(self), user: user)
         return try Amount(rawBalance.value(forKey: "balance"), currency: rawBalance.value(forKey: "currency"))
     }
     
     /// The amount the account has spent today (Considered from approx. 4am onwards)
     public func spentToday() throws -> Amount {
-        let rawBalance = try user.client.provider.request(.balance(self))
+        let rawBalance = try user.client.provider.request(.balance(self), user: user)
         return try Amount(rawBalance.value(forKey: "spend_today"), currency: rawBalance.value(forKey: "currency"))
     }
     
     // MARK: Webhook
     
     private func loadWebhooks() throws {
-        let rawWebhooks = try user.client.provider.requestArray(.webhooks(self))
+        let rawWebhooks = try user.client.provider.requestArray(.webhooks(self), user: user)
         _webhooks = try rawWebhooks.map({ try Webhook(account: self, json: $0) })
     }
     
     public func addWebhook(url: URL) throws {
-        let rawWebhook = try user.client.provider.request(.registerWebhook(self, url))
+        let rawWebhook = try user.client.provider.request(.registerWebhook(self, url), user: user)
         let webhook = try Webhook(account: self, json: rawWebhook)
         _webhooks.append(webhook)
     }
     
     public func removeWebhook(_ webhook: Webhook) throws {
-        try user.client.provider.deliver(.deleteWebhook(webhook))
+        try user.client.provider.deliver(.deleteWebhook(webhook), user: user)
         guard let index = _webhooks.index(where: { $0.id == webhook.id }) else { return }
         _webhooks.remove(at: index)
     }
@@ -109,6 +109,7 @@ public final class Account {
     // MARK: Feed Item
     
     public func sendFeedItem(_ feedItem: BasicFeedItem) throws {
-        try user.client.provider.deliver(.sendFeedItem(self, feedItem))
+        try feedItem.validate()
+        try user.client.provider.deliver(.sendFeedItem(self, feedItem), user: user)
     }
 }

@@ -4,10 +4,7 @@
 - Add an attachments flow to transactions
 - Add all the authentication flow
 - Add tests to all calls
-- Look into a working CI solution (Buddybuild doesn't seem to like Linux builds)
 - Tidy up GitHub versions, make the working version 1
-- Add security to all endpoints to ensure values meet criteria (e.g. feed item must have a non empty title)
-    - Maybe use Vapor's "Validation" feature? dunno
 - Documentation sweep
 
 # Monzo Client for Vapor
