@@ -28,6 +28,7 @@ class MockResponder: Responder {
             case "/transactions" where request.uri.query?.contains("expand") == true: return "transactions"
             case "/transactions": return "transactionsNoMerchant"
             case "/feed", "/webhooks/webhook_2": return "empty"
+            case "/ping/whoami": return "whoami"
             default: print("📛 " + request.uri.path); return "empty"
             }
         }()

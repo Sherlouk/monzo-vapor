@@ -17,6 +17,7 @@ final class Provider {
         case sendFeedItem(Account, FeedItem)
         case refreshToken(User)
         case exchangeToken(MonzoClient, URL, String)
+        case whoami(User)
     }
     
     private let client: MonzoClient
@@ -109,6 +110,7 @@ extension Provider.Requests {
         case .registerWebhook(let account, _): return account.user.accessToken
         case .deleteWebhook(let webhook): return webhook.account.user.accessToken
         case .sendFeedItem(let account, _): return account.user.accessToken
+        case .whoami(let user): return user.accessToken
         }
     }
     
@@ -125,6 +127,7 @@ extension Provider.Requests {
         case .deleteWebhook(let webhook): return "webhooks/\(webhook.id)"
         case .sendFeedItem: return "feed"
         case .refreshToken, .exchangeToken: return "oauth2/token"
+        case .whoami: return "ping/whoami"
         }
     }
     

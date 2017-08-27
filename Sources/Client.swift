@@ -60,6 +60,12 @@ public final class MonzoClient {
         return URI(scheme: "https", hostname: "auth.getmondo.co.uk", query: query)
     }
     
+    /// Validates the user has successfully authorised your client and is capable of making requests
+    ///
+    /// - Parameters:
+    ///   - req: The request when the user was redirected back to your server
+    ///   - nonce: The nonce used when redirecting the user to Monzo
+    /// - Returns: On success, returns an authenticated user object for further requests
     public func authenticateUser(_ req: Request, nonce: String?) throws -> User {
         guard let code = req.query?["code"]?.string else { throw MonzoAuthError.missingParameters }
         

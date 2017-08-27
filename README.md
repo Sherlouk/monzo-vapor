@@ -1,6 +1,6 @@
 # Monzo Client for Vapor
 
-[![Swift](https://img.shields.io/badge/Swift-3.1-orange.svg?style=flat)](https://swift.org) [![BuddyBuild](https://dashboard.buddybuild.com/api/statusImage?appID=59a0096f544c6c000177522a&branch=master&build=latest)](https://dashboard.buddybuild.com/apps/59a0096f544c6c000177522a/build/latest?branch=master)
+[![Swift](https://img.shields.io/badge/Swift-3.1-orange.svg?style=flat)](https://swift.org)
 
 A Monzo client that provides an interface to the public Monzo API. It's built around [Vapor](https://vapor.codes/), and designed for usage in server-side Swift environments.
 
@@ -152,7 +152,7 @@ Taking authentication aside this simple ping test allows you to check that you a
 If the response is `false` then I suggest you wait a bit before trying to run further requests!
 
 ```swift
-let success = monzoClient.ping()
+let success = client.ping()
 ```
 
 ### Undocumented

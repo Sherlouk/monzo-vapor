@@ -27,6 +27,14 @@ public final class User {
         return try rawAccounts.map({ try Account(user: self, json: $0) })
     }
     
+    /// Queries the "Who Am I?" endpoint to validate that the access token is currently valid
+    ///
+    /// - Returns: Whether or not the user is currently authenticated
+    public func ping() throws -> Bool {
+        let rawResponse = try client.provider.request(.whoami(self), user: self)
+        return try rawResponse.value(forKey: "authenticated")
+    }
+    
     /// Uses the user's refresh token to create a new access token
     public func refreshAccessToken() throws {
         guard refreshToken != nil else { throw MonzoUsageError.noRefreshToken }

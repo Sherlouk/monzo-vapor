@@ -17,7 +17,18 @@ class UserTests: XCTestCase {
         XCTAssertTrue(userTwo.client === client)
     }
     
+    func testWhoAmI() {
+        let responder = MockResponder()
+        let client = MonzoClient(publicKey: "", privateKey: "", httpClient: responder)
+        let userOne = client.createUser(accessToken: "token", refreshToken: nil)
+        
+        XCTAssertNoThrow(try userOne.ping())
+        XCTAssertEqual(responder.lastRequest?.uri.description, "https://api.monzo.com:443/ping/whoami")
+        XCTAssertEqual(responder.lastRequest?.headers[.authorization], "Bearer token")
+    }
+    
     static var allTests = [
         ("testInitialiser", testInitialiser),
+        ("testWhoAmI", testWhoAmI),
     ]
 }
