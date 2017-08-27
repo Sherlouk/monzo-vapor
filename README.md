@@ -155,6 +155,8 @@ If the response is `false` then I suggest you wait a bit before trying to run fu
 let success = client.ping()
 ```
 
+You can also call `.ping()` on a user, this will also validate their access token to ensure they're still authenticated.
+
 ### Undocumented
 
 The Monzo API is currently in it's own mode of beta, and is not designed for public use. There is a ticket on the [public roadmap](https://trello.com/b/9tcaMB4w/monzo-transparent-product-roadmap) currently under "Long Term" which is for the new public API and features such as Sandbox Payments.
@@ -165,10 +167,6 @@ Given that, it's fair and understandable that not every endpoint is documented. 
 // Retrieve Current Accounts instead of Prepaid Accounts
 // If you'd like both types, then you'll need to make two requests
 let accounts = try user.accounts(fetchCurrentAccounts: true)
-
-// TODO:
-// /feed?account_id=$account_id
-
 ```
 
 ## Support
