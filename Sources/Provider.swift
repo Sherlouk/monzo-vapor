@@ -43,6 +43,10 @@ final class Provider {
             return try deliver(req, user: user, allowRefresh: false)
         }
         
+        if let json = response.json, json["error"]?.string != nil, let message = json["message"]?.string {
+            throw MonzoAPIError.response(message)
+        }
+        
         try validateResponseStatus(response.status)
     }
     
@@ -52,6 +56,10 @@ final class Provider {
         
         if allowRefresh, try refreshTokenIfNeeded(response, user: user) {
             return try self.request(req, user: user, allowRefresh: false)
+        }
+        
+        if let json = response.json, json["error"]?.string != nil, let message = json["message"]?.string {
+            throw MonzoAPIError.response(message)
         }
         
         try validateResponseStatus(response.status)
@@ -226,6 +234,10 @@ extension Provider.Requests {
         
         if let token = bearerToken {
             builder[.authorization] = "Bearer \(token)"
+        }
+        
+        if method == .post || method == .patch {
+            builder[.contentType] = "application/x-www-form-urlencoded; charset=utf-8"
         }
         
         return builder

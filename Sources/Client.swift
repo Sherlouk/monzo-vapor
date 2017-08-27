@@ -67,13 +67,10 @@ public final class MonzoClient {
     ///   - nonce: The nonce used when redirecting the user to Monzo
     /// - Returns: On success, returns an authenticated user object for further requests
     public func authenticateUser(_ req: Request, nonce: String?) throws -> User {
-        guard let code = req.query?["code"]?.string else { throw MonzoAuthError.missingParameters }
+        guard let code = req.query?["code"]?.string,
+              let state = req.query?["state"]?.string else { throw MonzoAuthError.missingParameters }
         
-        if let state = req.query?["state"]?.string {
-            guard state == nonce else { throw MonzoAuthError.conflictedNonce }
-        } else if nonce != nil {
-            throw MonzoAuthError.missingParameters
-        }
+        guard state == nonce ?? "" else { throw MonzoAuthError.conflictedNonce }
         
         let url = try req.uri.makeFoundationURL()
         let response = try provider.request(.exchangeToken(self, url, code))

@@ -10,6 +10,7 @@ public enum MonzoAPIError: Error {
     case tooManyRequests
     case internalError
     case gatewayTimeout
+    case response(String)
     case other(Int, String)
     
     init?(statusCode: Int) {
@@ -41,6 +42,7 @@ extension MonzoAPIError: Debuggable {
         case .internalError: return "500"
         case .gatewayTimeout: return "504"
         case .other(let code, _): return "\(code)"
+        case .response(let message): return "\(message)"
         }
     }
     
@@ -56,6 +58,7 @@ extension MonzoAPIError: Debuggable {
         case .internalError: return "Something is wrong on Monzo's end"
         case .gatewayTimeout: return "Something has timed out on Monzo's end"
         case .other(_, let message): return message
+        case .response(let message): return message
         }
     }
     
