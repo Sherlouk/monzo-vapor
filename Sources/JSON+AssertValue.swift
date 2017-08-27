@@ -8,7 +8,7 @@ extension JSON {
         if T.self is Bool.Type, let value = self[key]?.bool as? T { return value }
         if T.self is URL.Type, let value = self[key]?.url as? T { return value }
         if T.self is Date.Type, let value = self[key]?.date as? T { return value }
-        if T.self is Int64.Type, let value = self[key]?.int64 as? T { return value }
+        if T.self is Int.Type, let value = self[key]?.int as? T { return value }
         
         throw ClientError.other(1, ":(")
     }

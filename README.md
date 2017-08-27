@@ -1,14 +1,16 @@
 > WORK IN PROGRESS - DO NOT USE
 
 - Setup proper error enums, which conform to Debuggable (Vapor)
-- Add support for loading current accounts
 - Add pagination to transactions flow
-- Finish the transaction/merchant call
 - Add an attachments flow to transactions
 - Add all the authentication flow
 - Add tests to all calls
 - Look into a working CI solution (Buddybuild doesn't seem to like Linux builds)
 - Tidy up GitHub versions, make the working version 1
+- Add descriptions to all elements for easier printing/debugging
+- Add security to all endpoints to ensure values meet criteria (e.g. feed item must have a non empty title)
+    - Maybe use Vapor's "Validation" feature? dunno
+- Documentation sweep
 
 # Monzo Client for Vapor
 
@@ -62,10 +64,11 @@ let client = MonzoClient(publicKey: "...", privateKey: "...", httpClient: Drople
 
 Most of the functionality within Monzo is bound to a particular account, obtaining accounts for a user is easy!
 
-
 ```swift
 let accounts = try user.accounts()
 ```
+
+> Using undocumented functionality you can also retrieve current accounts, see the [undocumented section](https://github.com/Sherlouk/monzo-vapor#undocumented)
 
 ### Fetch Balance
 
@@ -96,9 +99,9 @@ let feedItem = BasicFeedItem(title: "...", imageUrl: "...")
 let feedItem = BasicFeedItem(..., openUrl: "...",
                                   body: "...",
                                   options: [
-                                    .backgroundColor("#..."),
-                                    .titleColor("#..."),
-                                    .bodyColor("#...")
+                                    .backgroundColor("#ABCDEF"),
+                                    .titleColor("#ABCDEF"),
+                                    .bodyColor("#ABCDEF")
                                   ])
 
 try account.sendFeedItem(feedItem)
@@ -133,7 +136,8 @@ The Monzo API is currently in it's own mode of beta, and is not designed for pub
 Given that, it's fair and understandable that not every endpoint is documented. With that understanding I wanted to enable this framework to have access to all the endpoints I discover but with a clear warning that these are undocumented and might change.
 
 ```swift
-// Retrieve Current Accounts
+// Retrieve Current Accounts instead of Prepaid Accounts
+// If you'd like both types, then you'll need to make two requests
 let accounts = try user.accounts(fetchCurrentAccounts: true)
 
 // TODO:

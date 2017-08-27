@@ -11,13 +11,13 @@ public struct BasicFeedItem: FeedItem {
         return "basic"
     }
     
-    var title: String
-    var imageUrl: URL
-    var url: URL?
-    var body: String?
-    var options: [BasicFeedItemStyleOptions]
+    public var title: String
+    public var imageUrl: URL
+    public var url: URL?
+    public var body: String?
+    public var options: [BasicFeedItemStyleOptions]
     
-    init(title: String, imageUrl: URL, openUrl: URL? = nil, body: String? = nil, options: [BasicFeedItemStyleOptions] = []) {
+    public init(title: String, imageUrl: URL, openUrl: URL? = nil, body: String? = nil, options: [BasicFeedItemStyleOptions] = []) {
         self.title = title
         self.imageUrl = imageUrl
         self.url = openUrl

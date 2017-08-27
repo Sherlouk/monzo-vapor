@@ -6,9 +6,9 @@ final class Provider {
     
     enum Requests {
         case ping
-        case listAccounts(User)
+        case listAccounts(User, Bool)
         case balance(Account)
-        case transactions(Account)
+        case transactions(Account, Bool)
         case transaction(Account, String)
         case updateTransaction(Transaction)
         case webhooks(Account)
@@ -80,9 +80,9 @@ extension Provider.Requests {
     var bearerToken: String? {
         switch self {
         case .ping: return nil
-        case .listAccounts(let user): return user.accessToken
+        case .listAccounts(let user, _): return user.accessToken
         case .balance(let account): return account.user.accessToken
-        case .transactions(let account): return account.user.accessToken
+        case .transactions(let account, _): return account.user.accessToken
         case .transaction(let account, _): return account.user.accessToken
         case .updateTransaction(let transaction): return transaction.account.user.accessToken
         case .webhooks(let account): return account.user.accessToken
@@ -131,8 +131,20 @@ extension Provider.Requests {
     
     var params: [Parameters] {
         switch self {
+        case .listAccounts(_, let loadCurrentAccounts):
+            guard loadCurrentAccounts else { return [] }
+            return [.basic("account_type", "uk_retail")]
         case .balance(let account): return [.account(account)]
-        case .transactions(let account): return [.account(account)]
+        case .transactions(let account, let expandMerchant):
+            var builder: [Parameters] = [
+                .account(account)
+            ]
+            
+            if expandMerchant {
+                builder.append(.array("expand", ["merchant"]))
+            }
+            
+            return builder
         case .updateTransaction(let transaction): return [.dictionary("metadata", transaction.metadata)]
         case .webhooks(let account): return [.account(account)]
         case .registerWebhook(let account, let url): return [.account(account), .basic("url", url.absoluteString)]
@@ -263,7 +275,7 @@ enum ClientError: Error {
 
 extension DateFormatter {
     /// Monzo Data Formatter, based on ISO8601 without the milliseconds
-    @nonobjc public static let monzoiso8601: DateFormatter = {
+    @nonobjc static let monzoiso8601: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
