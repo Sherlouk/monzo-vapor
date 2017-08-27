@@ -1,0 +1,10 @@
+{
+    "accounts": [
+        {
+            "id": "account_3",
+            "description": "Demo Current Account One",
+            "created": "2015-11-13T12:17:43Z",
+            "type": "uk_retail"
+        }
+    ]
+}

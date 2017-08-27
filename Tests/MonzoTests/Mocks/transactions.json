@@ -1,0 +1,96 @@
+{
+  "transactions": [
+    {
+      "id": "transaction_1",
+      "created": "2016-10-05T16:58:38.743Z",
+      "description": "Initial top up",
+      "amount": 10000,
+      "currency": "GBP",
+      "merchant": null,
+      "notes": "",
+      "metadata": {
+        "is_topup": "true"
+      },
+      "account_balance": 10000,
+      "attachments": [],
+      "category": "mondo",
+      "is_load": true,
+      "settled": "2016-10-05T16:58:38.743Z",
+      "local_amount": 10000,
+      "local_currency": "GBP",
+      "updated": "2016-10-05T16:58:38.994Z",
+      "account_id": "account_1",
+      "counterparty": {},
+      "scheme": "gps_mastercard",
+      "dedupe_id": "123456",
+      "originator": false,
+      "include_in_spending": false
+    },
+    {
+      "id": "transaction_2",
+      "created": "2016-10-06T07:32:56.3Z",
+      "description": "MCDONALDS",
+      "amount": -200,
+      "currency": "GBP",
+      "merchant": {
+        "id": "merchant_1",
+        "group_id": "group_1",
+        "created": "2016-02-03T23:00:41.91Z",
+        "name": "McDonald's",
+        "logo": "https://mondo-logo-cache.appspot.com/twitter/@mcdonalds/",
+        "emoji": "🍔",
+        "category": "eating_out",
+        "online": false,
+        "atm": false,
+        "address": {
+          "short_formatted": "Leeds Station, Leeds LS1 4DY",
+          "formatted": "Leeds Station, Leeds LS1 4DY, United Kingdom",
+          "address": "Leeds Station",
+          "city": "Leeds",
+          "region": "",
+          "country": "GBR",
+          "postcode": "LS1 4DY",
+          "latitude": 53.7948944,
+          "longitude": -1.5475776,
+          "zoom_level": 17,
+          "approximate": false
+        },
+        "updated": "2016-02-08T11:02:38.924Z",
+        "metadata": {
+          "created_for_merchant": "merchant_1",
+          "created_for_transaction": "transaction_2",
+          "foursquare_category": "Fast Food Restaurant",
+          "foursquare_category_icon": "https://ss3.4sqi.net/img/categories_v2/food/fastfood_88.png",
+          "foursquare_id": "4b8532a8f964a5205f5031e3",
+          "foursquare_website": "http://www.mcdonalds.co.uk",
+          "google_places_icon": "https://maps.gstatic.com/mapfiles/place_api/icons/restaurant-71.png",
+          "google_places_id": "ChIJaTDa_R5ceUgR3WdO3HVPKx4",
+          "google_places_name": "Mcdonald's",
+          "suggested_name": "McDonald's",
+          "suggested_tags": "#food #burger #chips #fries #fastfood #nuggets",
+          "twitter_id": "mcdonalds",
+          "website": "http://www.mcdonalds.co.uk/"
+        },
+        "disable_feedback": false
+      },
+      "notes": "Yum Yum",
+      "metadata": {
+        "foo": "bar"
+      },
+      "account_balance": 9800,
+      "attachments": [],
+      "category": "eating_out",
+      "is_load": false,
+      "settled": "2016-10-07T11:08:50.26Z",
+      "local_amount": -200,
+      "local_currency": "GBP",
+      "updated": "2017-08-26T14:54:32.717Z",
+      "account_id": "account_1",
+      "counterparty": {},
+      "scheme": "gps_mastercard",
+      "dedupe_id": "123456",
+      "originator": false,
+      "include_in_spending": true
+    }
+  ]
+}

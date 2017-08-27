@@ -2,7 +2,7 @@ import Foundation
 import JSON
 
 public final class Account {
-    public enum `Type` {
+    public enum AccountType {
         /// Monzo Prepaid Account
         case prepaid
         
@@ -27,7 +27,7 @@ public final class Account {
     let user: User
     
     /// The type of account (e.g. prepaid or current account)
-    public let type: Type
+    public let type: AccountType
     
     /// The account's unique identifier
     public let id: String
@@ -58,17 +58,9 @@ public final class Account {
     
     // MARK: Initialiser
     
-    init(user: User, type: Type, id: String, description: String, created: Date) {
-        self.user = user
-        self.type = type
-        self.id = id
-        self.description = description
-        self.created = created
-    }
-    
     init(user: User, json: JSON) throws {
         self.user = user
-        self.type = Type(rawValue: try json.value(forKey: "type"))
+        self.type = AccountType(rawValue: try json.value(forKey: "type"))
         self.id = try json.value(forKey: "id")
         self.description = try json.value(forKey: "description")
         self.created = try json.value(forKey: "created")
@@ -76,7 +68,7 @@ public final class Account {
     
     // MARK: Transactions
     
-    public func transactions(merchantInfo: Bool) throws -> [Transaction] {
+    public func transactions(merchantInfo: Bool = true) throws -> [Transaction] {
         let rawTransactions = try user.client.provider.request(.transactions(self, merchantInfo))
         return try rawTransactions.array?.map({ try Transaction(account: self, json: $0) }) ?? []
     }

@@ -14,7 +14,7 @@ public struct Amount {
 
     // MARK: - Initialiser
     
-    init(_ amount: Int, currency: String) throws {
+    init(_ amount: Int, currency: String) {
         self.amount = amount
         self.currency = currency
     }

@@ -6,12 +6,6 @@ public struct Webhook {
     public let url: URL
     let account: Account
     
-    init(account: Account, id: String, url: URL) {
-        self.account = account
-        self.id = id
-        self.url = url
-    }
-    
     init(account: Account, json: JSON) throws {
         self.account = account
         self.id = try json.value(forKey: "id")

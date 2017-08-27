@@ -99,7 +99,7 @@ public struct Transaction {
     public var isRefund: Bool { return amount.amount > 0 && !isLoad }
     
     public let declineReason: DeclineReason?
-    public var declined: Bool { return declineReason == nil }
+    public var declined: Bool { return declineReason != nil }
     
     public let created: Date
     public let settled: Date? // No Settled means authorised but not completed
@@ -109,7 +109,7 @@ public struct Transaction {
     
     public let category: Category
     
-    public let merchantId: String
+    public let merchantId: String?
     
     /// Information about the merchant
     ///
@@ -131,10 +131,12 @@ public struct Transaction {
         if let merchant = json["merchant"]?.string {
             self.merchantId = merchant
             self.merchant = nil
-        } else {
-            let merchant: Merchant = try json.value(forKey: "merchant")
+        } else if let merchant: Merchant = try? Merchant(json: json["merchant"]) {
             self.merchantId = merchant.id
             self.merchant = merchant
+        } else {
+            self.merchantId = nil
+            self.merchant = nil
         }
         
         self.metadata = [String: String?]()
@@ -162,5 +164,6 @@ public struct Transaction {
     
     mutating func refresh() {
         // Update all values by making a new network request for the ID (the only constant)
+//        let rawTransaction = try account.user.client.provider.request(.transaction(account, id))
     }
 }

@@ -1,0 +1,30 @@
+{
+  "transactions": [
+    {
+      "id": "transaction_2",
+      "created": "2016-10-06T07:32:56.3Z",
+      "description": "MCDONALDS",
+      "amount": -200,
+      "currency": "GBP",
+      "merchant": "merchant_1",
+      "notes": "Yum Yum",
+      "metadata": {
+        "foo": "bar"
+      },
+      "account_balance": 9800,
+      "attachments": [],
+      "category": "eating_out",
+      "is_load": false,
+      "settled": "2016-10-07T11:08:50.26Z",
+      "local_amount": -200,
+      "local_currency": "GBP",
+      "updated": "2017-08-26T14:54:32.717Z",
+      "account_id": "account_1",
+      "counterparty": {},
+      "scheme": "gps_mastercard",
+      "dedupe_id": "123456",
+      "originator": false,
+      "include_in_spending": true
+    }
+  ]
+}

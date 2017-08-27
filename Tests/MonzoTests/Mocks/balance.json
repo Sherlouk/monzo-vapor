@@ -1,7 +1,7 @@
 {
-  "balance": 32993,
-  "currency": "GBP",
-  "spend_today": 0,
+  "balance": 90000,
+  "currency": "USD",
+  "spend_today": -200,
   "local_currency": "",
   "local_exchange_rate": 0,
   "local_spend": []

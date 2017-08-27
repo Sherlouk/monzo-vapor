@@ -19,8 +19,16 @@ class MockResponder: Responder {
         
         let pathRaw: String? = {
             switch request.uri.path {
+            case "/accounts" where request.uri.query?.contains("uk_retail") == true: return "currentAccounts"
             case "/accounts": return "accounts"
-            default: return nil
+            case "/ping": return "ping"
+            case "/balance": return "balance"
+            case "/webhooks" where request.method == .post: return "newWebhook"
+            case "/webhooks": return "listWebhooks"
+            case "/transactions" where request.uri.query?.contains("expand") == true: return "transactions"
+            case "/transactions": return "transactionsNoMerchant"
+            case "/feed", "/webhooks/webhook_2": return "empty"
+            default: print("📛 " + request.uri.path); return "empty"
             }
         }()
         
