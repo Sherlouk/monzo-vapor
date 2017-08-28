@@ -114,11 +114,27 @@ class TransactionTests: XCTestCase {
         XCTAssertEqual(responder.lastRequest?.uri.description, "https://api.monzo.com:443/transactions?account_id=account_1&expand[]=merchant&limit=20&before=123456&since=654321")
     }
     
+    func testTransactionLoadMore() {
+        let responder = MockResponder()
+        let client = MonzoClient(publicKey: "", privateKey: "", httpClient: responder)
+        let user = client.createUser(accessToken: "", refreshToken: nil)
+        guard let account = (try? user.accounts())?.first else { XCTFail(); return }
+        guard var transactions = try? account.transactions() else { XCTFail(); return }
+        
+        XCTAssertEqual(transactions.count, 2)
+        XCTAssertNoThrow(try transactions.loadMore())
+        XCTAssertEqual(transactions.count, 3)
+        XCTAssertEqual(responder.lastRequest?.uri.description, "https://api.monzo.com:443/transactions?account_id=account_1&expand[]=merchant&since=transaction_2")
+        XCTAssertNoThrow(try transactions.loadMore())
+        XCTAssertEqual(responder.lastRequest?.uri.description, "https://api.monzo.com:443/transactions?account_id=account_1&expand[]=merchant&since=transaction_3")
+    }
+    
     static var allTests = [
         ("testFetchTransactions", testFetchTransactions),
         ("testFetchTransactionsNoMerchantInfo", testFetchTransactionsNoMerchantInfo),
         ("testTransactionCategories", testTransactionCategories),
         ("testTransactionDeclineReason", testTransactionDeclineReason),
         ("testTransactionRequests", testTransactionRequests),
+        ("testTransactionLoadMore", testTransactionLoadMore),
     ]
 }

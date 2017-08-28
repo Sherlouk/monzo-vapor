@@ -190,3 +190,26 @@ extension Transaction: CustomDebugStringConvertible {
         return "Transaction(\(id))"
     }
 }
+
+extension Array where Element: Transaction {
+    
+    mutating func loadMore(merchantInfo: Bool = true, limit: Int? = nil) throws -> Bool {
+        let transactions = sorted(by: { $0.created.timeIntervalSince1970 < $1.created.timeIntervalSince1970 })
+        guard let latest = transactions.last else { return false }
+        
+        var options: [PaginationOptions] = [
+            .since(latest.id)
+        ]
+        
+        if let limit = limit {
+            options.append(.limit(limit))
+        }
+        
+        let newTransactions = try latest.account.transactions(merchantInfo: merchantInfo, options: options)
+        guard let elements = newTransactions as? [Element], newTransactions.count > 0 else { return false }
+        
+        append(contentsOf: elements)
+        return true
+    }
+    
+}
