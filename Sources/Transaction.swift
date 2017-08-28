@@ -183,6 +183,17 @@ public final class Transaction {
         // Update all values by making a new network request for the ID (the only constant)
 //        let rawTransaction = try account.user.client.provider.request(.transaction(account, id))
     }
+    
+    // MARK: - Attachments
+    
+    public func registerAttachment(url: URL) throws -> Attachment {
+        let rawAttachment = try account.user.client.provider.request(.registerAttachment(self, url))
+        return try Attachment(transaction: self, json: rawAttachment)
+    }
+    
+    public func deregisterAttachment(_ attachment: Attachment) throws {
+        try account.user.client.provider.deliver(.deregisterAttachment(attachment))
+    }
 }
 
 extension Transaction: CustomDebugStringConvertible {

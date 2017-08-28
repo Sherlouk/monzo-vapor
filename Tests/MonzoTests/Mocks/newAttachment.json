@@ -1,0 +1,10 @@
+{
+    "attachment": {
+        "id": "attachment_1",
+        "user_id": "user_1",
+        "external_id": "transaction_2",
+        "file_url": "https://google.com/image/foobar.png",
+        "file_type": "image/png",
+        "created": "2015-11-12T18:37:02Z"
+    }
+}

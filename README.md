@@ -145,7 +145,15 @@ try webhook.remove()
 
 ### Attachments
 
-> Attachments are currently not supported
+```swift
+// Register Attachment
+let attachment = try transaction.registerAttachment(url: ...)
+
+// Deregister Attachment
+try attachment.deregister()
+```
+
+> We currently don't support uploading attachments, this is coming soon!
 
 ### Error Handling
 

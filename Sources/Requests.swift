@@ -3,18 +3,27 @@ import HTTP
 
 enum Requests {
     case ping
+    
+    case whoami(User)
+    
     case listAccounts(User, Bool)
     case balance(Account)
+    
     case transactions(Account, Bool, [PaginationOptions])
     case transaction(Account, String)
     case updateTransaction(Transaction)
+    
     case webhooks(Account)
     case registerWebhook(Account, URL)
     case deleteWebhook(Webhook)
+    
     case sendFeedItem(Account, FeedItem)
+    
     case refreshToken(User)
     case exchangeToken(MonzoClient, URL, String)
-    case whoami(User)
+    
+    case registerAttachment(Transaction, URL)
+    case deregisterAttachment(Attachment)
 }
 
 extension Requests {
@@ -31,6 +40,8 @@ extension Requests {
         case .deleteWebhook(let webhook): return webhook.account.user.accessToken
         case .sendFeedItem(let account, _): return account.user.accessToken
         case .whoami(let user): return user.accessToken
+        case .registerAttachment(let transaction, _): return transaction.account.user.accessToken
+        case .deregisterAttachment(let attachment): return attachment.transaction.account.user.accessToken
         }
     }
     
@@ -48,6 +59,8 @@ extension Requests {
         case .sendFeedItem: return "feed"
         case .refreshToken, .exchangeToken: return "oauth2/token"
         case .whoami: return "ping/whoami"
+        case .registerAttachment: return "attachment/register"
+        case .deregisterAttachment: return "attachment/deregister"
         }
     }
     
@@ -59,6 +72,7 @@ extension Requests {
         case .updateTransaction: return "transaction"
         case .webhooks: return "webhooks"
         case .registerWebhook: return "webhook"
+        case .registerAttachment: return "attachment"
         default: return nil
         }
     }
@@ -70,6 +84,7 @@ extension Requests {
         case .deleteWebhook: return .delete
         case .sendFeedItem: return .post
         case .refreshToken, .exchangeToken: return .post
+        case .registerAttachment, .deregisterAttachment: return .post
         default: return .get
         }
     }
@@ -136,6 +151,21 @@ extension Requests {
                     .basic("client_secret", client.privateKey),
                     .basic("redirect_uri", url.absoluteString),
                     .basic("code", code)]
+        case .registerAttachment(let transaction, let url):
+            let filePath = url.absoluteString
+            let fileType: String? = {
+                if let fileExtension = filePath.components(separatedBy: ".").last {
+                    return Request.mediaTypes[fileExtension]
+                }
+                
+                return nil
+            }()
+            
+            return [.basic("external_id", transaction.id),
+                    .basic("file_url", filePath),
+                    .basic("file_type", fileType ?? "image/png")]
+        case .deregisterAttachment(let attachment):
+            return [.basic("id", attachment.id)]
         default: return []
         }
     }
