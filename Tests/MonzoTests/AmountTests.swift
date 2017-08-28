@@ -16,7 +16,7 @@ class AmountTests: XCTestCase {
     
     func testAccountBalanceResponse() {
         let client = MonzoClient(publicKey: "", privateKey: "", httpClient: MockResponder())
-        let user = client.createUser(accessToken: "", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "", refreshToken: nil)
         guard let account = (try? user.accounts())?.first else { XCTFail(); return }
         guard let amount = try? account.balance() else { XCTFail(); return }
         
@@ -26,7 +26,7 @@ class AmountTests: XCTestCase {
     
     func testAccountBalanceRequest() {
         let client = MonzoClient(publicKey: "", privateKey: "", httpClient: MockResponder())
-        let user = client.createUser(accessToken: "balanceToken", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "balanceToken", refreshToken: nil)
         guard let account = (try? user.accounts())?.first else { XCTFail(); return }
         
         let request = try? client.provider.createRequest(.balance(account))
@@ -36,7 +36,7 @@ class AmountTests: XCTestCase {
     
     func testAccountSpentTodayResponse() {
         let client = MonzoClient(publicKey: "", privateKey: "", httpClient: MockResponder())
-        let user = client.createUser(accessToken: "", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "", refreshToken: nil)
         guard let account = (try? user.accounts())?.first else { XCTFail(); return }
         guard let amount = try? account.spentToday() else { XCTFail(); return }
         

@@ -5,7 +5,7 @@ class TransactionTests: XCTestCase {
     
     func testFetchTransactions() {
         let client = MonzoClient(publicKey: "", privateKey: "", httpClient: MockResponder())
-        let user = client.createUser(accessToken: "", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "", refreshToken: nil)
         guard let account = (try? user.accounts())?.first else { XCTFail(); return }
         guard let transactions = try? account.transactions() else { XCTFail(); return }
         
@@ -45,7 +45,7 @@ class TransactionTests: XCTestCase {
     
     func testFetchTransactionsNoMerchantInfo() {
         let client = MonzoClient(publicKey: "", privateKey: "", httpClient: MockResponder())
-        let user = client.createUser(accessToken: "", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "", refreshToken: nil)
         guard let account = (try? user.accounts())?.first else { XCTFail(); return }
         guard let transactions = try? account.transactions(merchantInfo: false) else { XCTFail(); return }
         
@@ -92,7 +92,7 @@ class TransactionTests: XCTestCase {
     func testTransactionRequests() {
         let responder = MockResponder()
         let client = MonzoClient(publicKey: "", privateKey: "", httpClient: responder)
-        let user = client.createUser(accessToken: "", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "", refreshToken: nil)
         guard let account = (try? user.accounts())?.first else { XCTFail(); return }
      
         XCTAssertNoThrow(try account.transactions(merchantInfo: false))
@@ -117,7 +117,7 @@ class TransactionTests: XCTestCase {
     func testTransactionLoadMore() {
         let responder = MockResponder()
         let client = MonzoClient(publicKey: "", privateKey: "", httpClient: responder)
-        let user = client.createUser(accessToken: "", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "", refreshToken: nil)
         guard let account = (try? user.accounts())?.first else { XCTFail(); return }
         guard var transactions = try? account.transactions() else { XCTFail(); return }
         

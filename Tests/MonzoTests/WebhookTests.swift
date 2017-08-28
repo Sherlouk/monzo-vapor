@@ -5,7 +5,7 @@ class WebhookTests: XCTestCase {
     
     func testListWebhooks() {
         let client = MonzoClient(publicKey: "", privateKey: "", httpClient: MockResponder())
-        let user = client.createUser(accessToken: "", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "", refreshToken: nil)
         guard let account = (try? user.accounts())?.first else { XCTFail(); return }
         
         let webhooks = account.webhooks
@@ -17,7 +17,7 @@ class WebhookTests: XCTestCase {
     
     func testAddWebhook() {
         let client = MonzoClient(publicKey: "", privateKey: "", httpClient: MockResponder())
-        let user = client.createUser(accessToken: "", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "", refreshToken: nil)
         guard let account = (try? user.accounts())?.first else { XCTFail(); return }
         
         XCTAssertEqual(account.webhooks.count, 1)
@@ -30,7 +30,7 @@ class WebhookTests: XCTestCase {
     
     func testRemoveWebhook() {
         let client = MonzoClient(publicKey: "", privateKey: "", httpClient: MockResponder())
-        let user = client.createUser(accessToken: "", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "", refreshToken: nil)
         guard let account = (try? user.accounts())?.first else { XCTFail(); return }
         
         XCTAssertEqual(account.webhooks.count, 1)

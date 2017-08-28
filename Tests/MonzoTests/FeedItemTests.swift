@@ -33,7 +33,7 @@ class FeedItemTests: XCTestCase {
     func testSendFeedItemRequest() {
         let responder = MockResponder()
         let client = MonzoClient(publicKey: "", privateKey: "", httpClient: responder)
-        let user = client.createUser(accessToken: "feedItem", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "feedItem", refreshToken: nil)
         guard let account = (try? user.accounts())?.first else { XCTFail(); return }
         
         try? account.sendFeedItem(BasicFeedItem(title: "Title", imageUrl: URL(string: "http://monzo.com")!))

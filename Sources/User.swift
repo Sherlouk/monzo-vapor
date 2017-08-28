@@ -2,9 +2,9 @@
 public final class User {
     var client: MonzoClient
     
-    // Authorisation
-    var accessToken: String
-    var refreshToken: String?
+    public var userId: String
+    public var accessToken: String
+    public var refreshToken: String?
     
     /// Will automatically refresh the user's access token when it expires using the refresh token.
     ///
@@ -12,8 +12,9 @@ public final class User {
     public var autoRefreshToken = true
     
     /// Creates a new user with access token, and an optional refresh token
-    init(client: MonzoClient, accessToken: String, refreshToken: String?) {
+    init(client: MonzoClient, userId: String, accessToken: String, refreshToken: String?) {
         self.client = client
+        self.userId = userId
         self.accessToken = accessToken
         self.refreshToken = refreshToken
         self.autoRefreshToken = refreshToken != nil
@@ -32,6 +33,10 @@ public final class User {
     /// - Returns: Whether or not the user is currently authenticated
     public func ping() throws -> Bool {
         let rawResponse = try client.provider.request(.whoami(self), user: self)
+        
+        let responseUserId: String = try rawResponse.value(forKey: "user_id")
+        guard responseUserId == userId else { throw MonzoAuthError.genericError }
+        
         return try rawResponse.value(forKey: "authenticated")
     }
     

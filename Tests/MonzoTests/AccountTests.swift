@@ -5,7 +5,7 @@ class AccountTests: XCTestCase {
     
     func testFetchPrepaidAccounts() {
         let client = MonzoClient(publicKey: "", privateKey: "", httpClient: MockResponder())
-        let user = client.createUser(accessToken: "tokenPrepaid", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "tokenPrepaid", refreshToken: nil)
         
         let assertAccounts: (([Account]) -> Void) = { accounts in
             XCTAssertEqual(accounts.count, 2)
@@ -36,7 +36,7 @@ class AccountTests: XCTestCase {
     
     func testFetchCurrentAccounts() {
         let client = MonzoClient(publicKey: "", privateKey: "", httpClient: MockResponder())
-        let user = client.createUser(accessToken: "tokenCurrent", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "tokenCurrent", refreshToken: nil)
         
         do {
             let accounts = try user.accounts(fetchCurrentAccounts: true)
@@ -61,7 +61,7 @@ class AccountTests: XCTestCase {
     func testFetchPrepaidAccountsRequest() {
         let responder = MockResponder()
         let client = MonzoClient(publicKey: "public", privateKey: "private", httpClient: responder)
-        let user = client.createUser(accessToken: "prepaidToken", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "prepaidToken", refreshToken: nil)
         
         let request = try? client.provider.createRequest(.listAccounts(user, false))
         XCTAssertEqual(request?.uri.description, "https://api.monzo.com:443/accounts")
@@ -71,7 +71,7 @@ class AccountTests: XCTestCase {
     func testFetchCurrentAccountsRequest() {
         let responder = MockResponder()
         let client = MonzoClient(publicKey: "public", privateKey: "private", httpClient: responder)
-        let user = client.createUser(accessToken: "currentToken", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "currentToken", refreshToken: nil)
         
         let request = try? client.provider.createRequest(.listAccounts(user, true))
         XCTAssertEqual(request?.uri.description, "https://api.monzo.com:443/accounts?account_type=uk_retail")

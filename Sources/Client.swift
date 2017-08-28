@@ -6,21 +6,22 @@ public final class MonzoClient {
     let privateKey: String
     let httpClient: Responder
     lazy var provider: Provider = { return Provider(client: self) }()
-    
-    public convenience init(publicKey: String, privateKey: String, clientFactory: ClientFactoryProtocol) {
-        let responder: Responder = {
-            // Attempt to re-use the same client (better performance)
-            if let port = URI.defaultPorts["https"],
-                let client = try? clientFactory.makeClient(hostname: "api.monzo.com", port: port, securityLayer: .none) {
-                return client
-            }
-            
-            // Default Implementation (Will create a new client for every request)
-            return clientFactory
-        }()
-        
-        self.init(publicKey: publicKey, privateKey: privateKey, httpClient: responder)
-    }
+
+    // Leaving this code as something that should be investigated! Getting errors with Vapor though.
+//    public convenience init(publicKey: String, privateKey: String, clientFactory: ClientFactoryProtocol) {
+//        let responder: Responder = {
+//            // Attempt to re-use the same client (better performance)
+//            if let port = URI.defaultPorts["https"],
+//                let client = try? clientFactory.makeClient(hostname: "api.monzo.com", port: port, securityLayer: .none) {
+//                return client
+//            }
+//            
+//            // Default Implementation (Will create a new client for every request)
+//            return clientFactory
+//        }()
+//        
+//        self.init(publicKey: publicKey, privateKey: privateKey, httpClient: responder)
+//    }
     
     public init(publicKey: String, privateKey: String, httpClient: Responder) {
         self.publicKey = publicKey
@@ -31,8 +32,8 @@ public final class MonzoClient {
     }
     
     /// Creates a new user with the provided access token required for authenticating all requests
-    public func createUser(accessToken: String, refreshToken: String?) -> User {
-        return User(client: self, accessToken: accessToken, refreshToken: refreshToken)
+    public func createUser(userId: String, accessToken: String, refreshToken: String?) -> User {
+        return User(client: self, userId: userId, accessToken: accessToken, refreshToken: refreshToken)
     }
     
     /// Pings the Monzo API and returns true if a valid response was fired back
@@ -75,9 +76,10 @@ public final class MonzoClient {
         let url = try req.uri.makeFoundationURL()
         let response = try provider.request(.exchangeToken(self, url, code))
         
+        let userId: String = try response.value(forKey: "user_id")
         let accessToken: String = try response.value(forKey: "access_token")
         let refreshToken: String? = try? response.value(forKey: "refresh_token")
-        return createUser(accessToken: accessToken, refreshToken: refreshToken)
+        return createUser(userId: userId, accessToken: accessToken, refreshToken: refreshToken)
     }
 }
 

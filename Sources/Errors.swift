@@ -159,6 +159,7 @@ extension MonzoUsageError: Debuggable {
 public enum MonzoAuthError: Error {
     case missingParameters
     case conflictedNonce
+    case genericError
 }
 
 extension MonzoAuthError: Debuggable {
@@ -166,6 +167,7 @@ extension MonzoAuthError: Debuggable {
         switch self {
         case .missingParameters: return "missingParameters"
         case .conflictedNonce: return "conflictedNonce"
+        case .genericError: return "genericError"
         }
     }
     
@@ -173,6 +175,7 @@ extension MonzoAuthError: Debuggable {
         switch self {
         case .missingParameters: return "Authentication request doesn't contain either a code or state"
         case .conflictedNonce: return "Nonce does not match the original"
+        case .genericError: return "Something went wrong!"
         }
     }
     

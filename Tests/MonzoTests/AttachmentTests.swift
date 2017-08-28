@@ -6,7 +6,7 @@ class AttachmentTests: XCTestCase {
     func testRegisterAttachment() {
         let responder = MockResponder()
         let client = MonzoClient(publicKey: "", privateKey: "", httpClient: responder)
-        let user = client.createUser(accessToken: "", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "", refreshToken: nil)
         guard let account = (try? user.accounts())?.first else { XCTFail(); return }
         guard let transactions = try? account.transactions() else { XCTFail(); return }
         guard let transaction = transactions.last else { XCTFail(); return }
@@ -20,7 +20,7 @@ class AttachmentTests: XCTestCase {
     func testDeregisterAttachment() {
         let responder = MockResponder()
         let client = MonzoClient(publicKey: "", privateKey: "", httpClient: responder)
-        let user = client.createUser(accessToken: "", refreshToken: nil)
+        let user = client.createUser(userId: "", accessToken: "", refreshToken: nil)
         guard let account = (try? user.accounts())?.first else { XCTFail(); return }
         guard let transactions = try? account.transactions() else { XCTFail(); return }
         guard let transaction = transactions.last else { XCTFail(); return }
