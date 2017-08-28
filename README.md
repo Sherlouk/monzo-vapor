@@ -89,6 +89,15 @@ let spentToday = try account.spentToday()
 
 ```swift
 let transactions = try account.transactions()
+
+// If you'd rather not have merchant information, then you can turn it off
+let transactions = try account.transactions(merchantInfo: false)
+
+// Pagination support
+let transactions = try account.transactions(options: [.limit(20), .since("2015-10-10T23:00:00Z")])
+
+// Once you have an array of transactions, you can load more! (Mutates provided array of transactions)
+let foundMore = try transactions.loadMore()
 ```
 
 ### Send Feed Item
@@ -113,6 +122,7 @@ let feedItem = BasicFeedItem(title: "...",
                               .bodyColor("#ABCDEF")
                             ])
 
+// Send the feed item to a given account
 try account.sendFeedItem(feedItem)
 ```
 
@@ -155,7 +165,13 @@ If the response is `false` then I suggest you wait a bit before trying to run fu
 let success = client.ping()
 ```
 
-You can also call `.ping()` on a user, this will also validate their access token to ensure they're still authenticated.
+You can also ping a user, in this instance it will also validate their access token.  If `autoRefreshToken` is enabled, and the user's token has expired then it will be refreshed.
+
+If the response is `false` then either something is wrong on Monzo's side or the user needs to be authenticated again.
+
+```swift
+let success = user.ping()
+```
 
 ### Undocumented
 
