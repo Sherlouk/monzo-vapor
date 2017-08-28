@@ -73,7 +73,10 @@ public final class MonzoClient {
         
         guard state == nonce ?? "" else { throw MonzoAuthError.conflictedNonce }
         
-        let url = try req.uri.makeFoundationURL()
+        var uri = req.uri
+        uri.query = nil // Remove the query to just get the base URL for comparison
+        
+        let url = try uri.makeFoundationURL()
         let response = try provider.request(.exchangeToken(self, url, code))
         
         let userId: String = try response.value(forKey: "user_id")
