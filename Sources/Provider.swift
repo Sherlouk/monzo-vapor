@@ -294,8 +294,8 @@ enum Parameters {
 }
 
 extension DateFormatter {
-    /// Monzo Data Formatter, based on ISO8601 without the milliseconds
-    @nonobjc static let monzoiso8601: DateFormatter = {
+    /// Monzo Data Formatter, based on RFC3339
+    @nonobjc static let rfc3339: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = TimeZone(secondsFromGMT: 0)

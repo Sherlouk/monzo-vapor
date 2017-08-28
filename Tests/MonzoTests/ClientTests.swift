@@ -13,7 +13,7 @@ class ClientTests: XCTestCase {
     
     func testMonzoSetup() {
         let _ = MonzoClient(publicKey: "...", privateKey: "...", httpClient: MockResponder())
-        XCTAssertTrue(Date.incomingDateFormatters.contains(.monzoiso8601))
+        XCTAssertTrue(Date.incomingDateFormatters.contains(.rfc3339))
     }
     
     func testMonzoPing() {

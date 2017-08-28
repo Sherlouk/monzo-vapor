@@ -83,6 +83,6 @@ public final class MonzoClient {
 
 final class Monzo {
     static func setup() {
-        Date.incomingDateFormatters.insert(.monzoiso8601, at: 0)
+        Date.incomingDateFormatters.insert(.rfc3339, at: 0)
     }
 }
