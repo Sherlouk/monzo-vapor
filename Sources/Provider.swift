@@ -8,7 +8,7 @@ final class Provider {
         case ping
         case listAccounts(User, Bool)
         case balance(Account)
-        case transactions(Account, Bool)
+        case transactions(Account, Bool, [PaginationOptions])
         case transaction(Account, String)
         case updateTransaction(Transaction)
         case webhooks(Account)
@@ -111,7 +111,7 @@ extension Provider.Requests {
         case .ping, .refreshToken, .exchangeToken: return nil
         case .listAccounts(let user, _): return user.accessToken
         case .balance(let account): return account.user.accessToken
-        case .transactions(let account, _): return account.user.accessToken
+        case .transactions(let account, _, _): return account.user.accessToken
         case .transaction(let account, _): return account.user.accessToken
         case .updateTransaction(let transaction): return transaction.account.user.accessToken
         case .webhooks(let account): return account.user.accessToken
@@ -168,13 +168,31 @@ extension Provider.Requests {
             guard loadCurrentAccounts else { return [] }
             return [.basic("account_type", "uk_retail")]
         case .balance(let account): return [.account(account)]
-        case .transactions(let account, let expandMerchant):
+        case .transactions(let account, let expandMerchant, let options):
             var builder: [Parameters] = [
                 .account(account)
             ]
             
             if expandMerchant {
                 builder.append(.array("expand", ["merchant"]))
+            }
+            
+            var existing = [String]()
+            options.forEach {
+                switch $0 {
+                case .before(let string):
+                    guard !existing.contains("before") else { return }
+                    existing.append("before")
+                    builder.append(.basic("before", string))
+                case .since(let string):
+                    guard !existing.contains("since") else { return }
+                    existing.append("since")
+                    builder.append(.basic("since", string))
+                case .limit(let count):
+                    guard !existing.contains("limit") else { return }
+                    existing.append("limit")
+                    builder.append(.basic("limit", "\(count)"))
+                }
             }
             
             return builder
@@ -291,6 +309,12 @@ enum Parameters {
             }).joined(separator: "&")
         }
     }
+}
+
+public enum PaginationOptions {
+    case limit(Int)
+    case before(String)
+    case since(String)
 }
 
 extension DateFormatter {

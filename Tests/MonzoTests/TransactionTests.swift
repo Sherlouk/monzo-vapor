@@ -89,10 +89,36 @@ class TransactionTests: XCTestCase {
         XCTAssertEqual(Transaction.DeclineReason(rawValue: "HUMAN_ERROR")?.description, "HUMAN_ERROR")
     }
     
+    func testTransactionRequests() {
+        let responder = MockResponder()
+        let client = MonzoClient(publicKey: "", privateKey: "", httpClient: responder)
+        let user = client.createUser(accessToken: "", refreshToken: nil)
+        guard let account = (try? user.accounts())?.first else { XCTFail(); return }
+     
+        XCTAssertNoThrow(try account.transactions(merchantInfo: false))
+        XCTAssertEqual(responder.lastRequest?.uri.description, "https://api.monzo.com:443/transactions?account_id=account_1")
+        
+        XCTAssertNoThrow(try account.transactions(merchantInfo: true))
+        XCTAssertEqual(responder.lastRequest?.uri.description, "https://api.monzo.com:443/transactions?account_id=account_1&expand[]=merchant")
+        
+        XCTAssertNoThrow(try account.transactions(merchantInfo: false, options: [.limit(10)]))
+        XCTAssertEqual(responder.lastRequest?.uri.description, "https://api.monzo.com:443/transactions?account_id=account_1&limit=10")
+        
+        XCTAssertNoThrow(try account.transactions(merchantInfo: false, options: [.limit(10), .limit(20)])) // Only first one counts
+        XCTAssertEqual(responder.lastRequest?.uri.description, "https://api.monzo.com:443/transactions?account_id=account_1&limit=10")
+        
+        XCTAssertNoThrow(try account.transactions(merchantInfo: false, options: [.limit(10), .before("123456")]))
+        XCTAssertEqual(responder.lastRequest?.uri.description, "https://api.monzo.com:443/transactions?account_id=account_1&limit=10&before=123456")
+        
+        XCTAssertNoThrow(try account.transactions(merchantInfo: true, options: [.limit(20), .before("123456"), .since("654321")]))
+        XCTAssertEqual(responder.lastRequest?.uri.description, "https://api.monzo.com:443/transactions?account_id=account_1&expand[]=merchant&limit=20&before=123456&since=654321")
+    }
+    
     static var allTests = [
         ("testFetchTransactions", testFetchTransactions),
         ("testFetchTransactionsNoMerchantInfo", testFetchTransactionsNoMerchantInfo),
         ("testTransactionCategories", testTransactionCategories),
         ("testTransactionDeclineReason", testTransactionDeclineReason),
+        ("testTransactionRequests", testTransactionRequests),
     ]
 }
