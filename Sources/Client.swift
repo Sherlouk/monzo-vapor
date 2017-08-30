@@ -55,7 +55,7 @@ public final class MonzoClient {
             .basic("response_type", "code")
         ]
         
-        if let nonce = nonce { parameters.append(.basic("code", nonce)) }
+        if let nonce = nonce { parameters.append(.basic("state", nonce)) }
         let query = parameters.map({ $0.encoded(.urlQuery) }).joined(separator: "&")
         
         return URI(scheme: "https", hostname: "auth.getmondo.co.uk", query: query)
